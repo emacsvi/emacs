@@ -1,0 +1,4 @@
+#+title: 比特币
+
+- [[file:bitcoin_concept.org][比特币是什么]]
+

@@ -1,0 +1,6 @@
+#+title: blog
+
+** 2016
+- 201602 [[file:./note/switch_road.org][未选择的路]]
+
+

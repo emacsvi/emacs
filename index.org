@@ -1,0 +1,21 @@
+#+title: liwei's homepage
+
+main index:
+
+- [[file:btc.org][Bitcoin]]
+- [[file:blog.org][Casual Readings]]
+- [[file:aboutme.org][About Me]]
+
+
+-----
+
+这是我最爱的吉姆尼，我会陪着他跋山涉水、去到很远很多的地方!!!
+
+fast index:
+
+*TL;DR*
+
+[[file:./images/jimny.jpg]]
+
+
+@2016-02-24
