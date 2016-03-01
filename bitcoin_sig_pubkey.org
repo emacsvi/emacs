@@ -1,0 +1,252 @@
+#+TITLE: 数字签名和数字证书
+
+1. [[http://m.oschina.net/blog/264417][数字签名和数字证书]]
+
+数字签名、数字证书等技术，是现代信息安全的核心技术，可谓使用面十分广泛。
+
+其基本理论本身并不复杂，本文希望通过深入浅出的介绍，能够让大家有一些基本了解。
+
+** 对称加密、非对称加密
+
+让我们通过一个例子开始：我们的主角分别是Alice和Bob。现在假设Alice要给Bob发送一份文件，文件内容非常机密。Alice不希望文件在发送的过程中被人截取而泄密。
+
+这个时候，自然想到的方法就是对文件进行加密。当然除了加密外，我们还需要让Bob能够解密。就像Alice对文件上了锁，为了让Bob能够解开，则Bob必须有钥匙来对文件解锁。在信息安全或密码学中，我们将这种钥匙称为密钥。密钥一般分为两种，对称密钥与非对称密钥：
+
+对称密钥很容易理解，如同Alice用一把钥匙将文件上锁，而Bob使用相同的钥匙就可以将文件解锁，即加密使用的密钥与解密使用的密钥是相同的。目前的对称密钥算法有DES、3DES、AES等，而密钥则一般是一串固定长度的字符。
+
+如下，Bob和Alice事先已经约定，将使用DES算法，并且已经约定好使用的密钥。于是Alice使用这份密钥对文件进行了加密，并发送给Bob。Bob使用相同的密钥对文件解密即可：
+
+
+[[file:./images/bitcoin_sig_pubkey_]]01.png
+
+[[file:./images/bitcoin_sig_pubkey_]]02.png
+
+
+对称密钥算法的安全性还是非常有保障的。拿DES算法举例，到目前为止，除了用穷举搜索法对DES算法进行攻击外，还没有发现更有效的办法。
+
+而56位长的密钥的穷举空间为256，这意味着如果一台计算机的速度是每一秒钟检测一百万个密钥，则它搜索完全部密钥就需要将近2285年的时间。
+
+而3DES（3次DES操作）、AES算法的安全性则更高。由此可见，使用对称密钥对文件进行了加密，基本上不用太担心文件可能泄密。
+
+
+前文提到的对称密钥算法，已经基本满足了Alice对于文件机密性的要求。然而还是存在两个问题：
+
+    1. Alice与Bob彼此之间必须约定将使用的密钥，而这个约定的过程本身就可能存在泄密的风险；
+
+    2. 如果除了Alice以外，还有Jessica、Eva、Mary等100位女士也需要向Bob发送文件。那么，Bob可能需要有100次约定密钥的过程。
+
+由此可见，无论是安全性还是可用性上，对称密钥都是存在问题的。而两个问题则是必须解决的。
+
+
+1976年，美国斯坦福大学的研究生Diffie和教授Hellman发表一个基于非对称密钥加密的想法，这个想法开创了密码学的变革。
+
+他们的想法其实非常简单，将密钥分为公钥（publicKey）和私钥（privateKey）两种。
+
+公钥加密的内容，使用私钥可以解开；而私钥加密的内容，公钥可以解开。然而，单独的知道公钥或私钥，却没有办法推出另一份密钥。
+
+
+
+继续我们的例子：仍然是Alice需要与Bob发送一份绝密文件。在此之前，Bob生成了一对密钥：公钥和私钥。
+
+Bob将公钥发布在了一个公共的密钥库中，而私钥则不对外公开，仅Bob本人持有。
+
+如下图所示，Alice从公钥库中取出Bob的公钥，对文件进行加密，再发送给Bob。而Bob通过自己持有的私钥，即可将文件解密：
+
+[[file:./images/bitcoin_sig_pubkey_03.png]]
+
+
+通过非对称密钥，Bob只是将公钥公布，并没有和Alice约定密钥。仅仅知道公钥是没有办法推出私钥的，因此不用担心私钥泄密的问题。
+
+另一反面，如果有jessica也想向Bob发送文件，仅需要从公钥库中取到Bob的公钥即可，也不需要更多的密钥。
+
+非对称密钥算法很有效的解决了安全性和可用性的问题，非对称密钥算法又称作“公开密钥加密算法”，我们常说的PKI（Public Key Infrastructure）则是建立在此技术之上的安全基础体系。
+
+目前使用最为广泛的非对称密钥为RSA算法，该算法是由三位算法发明者的姓氏开头字母命名而来。
+
+由于非对称加密算法的复杂度更高，因此非对称加密的速度远没有对称加密算法快，甚至可能比对称加密慢上1000倍。
+
+后续文章将介绍非对称密钥算法的典型场景：数字签名
+
+
+** 信息摘要、数字签名
+
+现在我们可以继续我们的场景：
+
+假设有一天，Alice收到了一份署名为Bob的文件。Alice希望能够确认这份文件一定是来自Bob；另外Alice希望能够确信，这份文件在传输过程中并没有被它人篡改。那么基于非对称密钥算法我们应该怎么做？
+
+确认文件一定来自于Bob，其实就是Bob无法否认自己发送过这份文件。信息安全中称作不可抵赖性；另一方面，确信文件并没有中途被篡改，则称作不可篡改性。
+
+在非对称密钥算法中提到，公钥加密的内容使用私钥可以解密。同样的，基于私钥加密的内容使用公钥也可以解密，两者一一对应。因此我们可以很容易想到。如果Bob利用自己手里的私钥对文件进行加密后，传输给Alice。Alice再通过公钥库中Bob的公钥进行解密，则可以证明文件一定是由Bob发出（由于只有Bob持有私钥）。另外，因为传输的是密文，如果能够使用公钥解密，同时也证明了文件并没有中途被篡改。这样的做法其实已经同时满足了不可抵赖性和不可篡改性。
+
+然而，由于传输的文件可能很大，为了证明文件的不可抵赖性和不可篡改性，需要对整个文件进行加密，由于非对称算法效率较低，这样做的代价太大。因此常规的做法是用到信息摘要和数字签名的方式。
+
+所谓信息摘要，其实就是某种HASH算法。将信息明文转化为固定长度的字符，它具有如下特点：
+
+1. 无论输入的消息有多长，计算出来的消息摘要的长度总是固定的；
+2. 用相同的摘要算法对相同的消息求两次摘要，其结果必然相同；
+3. 一般地，只要输入的消息不同，对其进行摘要以后产生的摘要消息也几乎不可能相同；
+4. 消息摘要函数是单向函数，即只能进行正向的信息摘要，而无法从摘要中恢复出任何的消息；
+5. 好的摘要算法，没有人能从中找到“碰撞”，虽然“碰撞”是肯定存在的。即对于给定的一个摘要，不可能找到一条信息使其摘要正好是给定的。或者说，无法找到两条消息，是它们的摘要相同。
+
+一般的，我们将信息的摘要也称作信息的指纹。如同指纹的含义，相同的信息一定会得相同的指纹，而仅通过指纹又无法还原出原始信息。目前主要的摘要算法有MD5和SHA1。
+
+当有了信息摘要技术以后，基于Bob向Alice发送文件的场景，我们可以进行如下的操作：
+
+[[file:./images/bitcoin_sig_pubkey_04.png]]
+
+第一步：
+1. Bob将原始的信息进行一次信息摘要算法，得到原始信息的摘要值；
+2. Bob使用自己的私钥，对该摘要值进行加密。得到信息摘要的密文；
+3. Bob将原始文件和摘要值的密文一起发送给Alice。
+4. 一般的，我们将原始文件和摘要密文称作Bob对原始文件的签名结果。
+
+[[file:./images/bitcoin_sig_pubkey_05.png]]
+
+第二步：
+1. 当Alice接收到Bob传输的信息（原始文件，信息摘要密文）后，使用Bob的公钥将摘要密文解密，得到信息摘要明文；
+2. 使用信息摘要算法，取原文的摘要信息，获取原始文件摘要信息；
+3. Alice比较解密后的摘要信息和取得的摘要信息。如果相同，则可以证明文件一定由Bob发送，并且中途并没有经过任何篡改。一般将这个过程称作 *验签* 。
+
+所谓数字签名，就是对原始文件的“指纹”进行了私钥加密。这样，即可保证文件的特征（摘要值）一定经过了私钥的加密。同时由于信息摘要的长度普遍不长（MD5为128位，SHA1主要为256位），也并没有带来太大的开销。
+
+如同对称密钥算法，在大部分开发语言中，基于非对称算法的数字签名，数字加密算法。也都进行了一定的封装。如下链接就比较详细的描述了基于JCE如何实现数字签名、加密、验证等
+
+** 数字证书
+前两篇文章，分别介绍了非对称加密算法和数字签名技术：
+1. [[http://blog.csdn.net/u014419512/article/details/26290821][签名和证书]]
+2. [[http://blog.csdn.net/u014419512/article/details/26408029][签名2]]
+
+
+基于非对称密钥算法，Bob生成了一对公私钥。Bob将公钥发布在公开的密钥库中。而Alice在向Bob发送加密文件或者验证Bob签名的文件时，均要从公钥库取到Bob的公钥。我们已经知道，一般来说公钥就是一段固定长度的字符串，并没有特定的含义。
+
+为了让Alice能够方便的辨别公钥，我们可以考虑对给公钥附加一些信息，例如该公钥使用的算法，该公钥的所有者（主题），该公钥的有效期等一系列属性。这样的数据结构我们称作PKCS10数据包.
+
+[[file:./images/bitcoin_sig_pubkey_06.png]]
+
+
+公钥的主题我们采用唯一标示符(或称DN-distinguished name)，以尽量唯一的标示公钥所有者。以下是基于抽象语法表示法所定义的PKCS10数据结构：
+
+#+BEGIN_SRC c++
+
+CertificationRequestInfo ::= SEQUENCE {  
+		version          INTEGER { v1(0) } (v1,...), 
+		subject          Name,  
+		subjectPKInfo  SubjectPublicKeyInfo{{ PKInfoAlgorithms }},  
+		attributes       [0] Attributes{{ CRIAttributes }}  
+		}  
+	SubjectPublicKeyInfo { ALGORITHM : IOSet} ::= SEQUENCE {  
+		algorithm     AlgorithmIdentifier {{IOSet}}, 
+		subjectPublicKey  BIT STRING  
+		}  
+
+	PKInfoAlgorithms ALGORITHM ::= {   
+		...  -- add any locally defined algorithms here -- }  
+	
+	Attributes { ATTRIBUTE:IOSet } ::= SET OF Attribute{{ IOSet }}   
+	
+	CRIAttributes  ATTRIBUTE  ::= {  
+		... -- add any locally defined attributes here -- }  
+
+	Attribute { ATTRIBUTE:IOSet } ::= SEQUENCE {  
+		type    ATTRIBUTE.&id({IOSet}),  
+		values  SET SIZE(1..MAX) OF ATTRIBUTE.&Type({IOSet}{@type}) 
+	}
+
+#+END_SRC
+
+
+我们已经有了PKCS10数据包，除了公钥信息外，还有公钥的持有者，公钥的版本号等信息。然而这样的数据结构其实并没有任何权威性。例如有一天一个叫做Richard的人想冒充Bob，也生成一对公私钥，并且使用了相同的公钥主题封装为P10数据结构。Alice其实并没有办法分辨哪个是真实Bob的公钥。
+
+为了解决这个问题，就需要一个权威的第三方机构，对P10结构的数据进行认证。就如同对P10文件盖上一个权威的章，防止仿照。这样的权威机构，我们称作CA(Certificate Authority)数字证书认证中心。而CA如何为P10数据盖章呢？非常简单，就是我们前文已经提到的数字签名技术：
+
+
+[[file:./images/bitcoin_sig_pubkey_07.png]]
+
+1. 如上图所示，CA机构其实也持有一张私钥。一般来说，CA会对这份私钥进行特别的保护，严禁泄漏和盗用。
+2. Bob将自己的公钥附加上一系列信息后，形成了P10数据包（请求包），并发送给CA。
+3. CA机构通过其他一些手段，例如查看Bob的身份信息等方式，认可了Bob的身份。于是使用自己的私钥对P10请求进行签名。（也可能会先对数据进行一些简单修改，如修改有效期或主题等）
+4. 这样的签名结果，我们就称作数字证书。
+
+数字证书同样遵循一个格式标准，我们称作X509标准，我们一般提到的X509证书就是如此。以下是X509的格式：
+
+#+BEGIN_SRC c++
+
+[Certificate ::= SEQUENCE {
+	tbsCertificate TBSCertificate,
+	signatureAlgorithm AlgorithmIdentifier,
+	signature BIT STRING
+}
+
+TBSCertificate ::= SEQUENCE {
+	version [0] EXPLICIT Version DEFAULT v1,
+	serialNumber CertificateSerialNumber,
+	signature AlgorithmIdentifier,
+	issuer Name,
+	validity Validity,
+	subject Name,
+	subjectPublicKeyInfo SubjectPublicKeyInfo,
+	issuerUniqueID [1] IMPLICIT UniqueIdentifier OPTIONAL,
+	-- If present, version must be v2or v3
+	subjectUniqueID [2] IMPLICIT UniqueIdentifier OPTIONAL,
+	-- If present, version must be v2or v3
+	extensions [3] EXPLICIT Extensions OPTIONAL
+	-- If present, version must be v3
+	}
+Version ::= INTEGER {
+	v1(0), v2(1), v3(2)
+}
+
+CertificateSerialNumber ::= INTEGER
+	Validity ::= SEQUENCE {
+	notBefore CertificateValidityDate,
+	notAfter CertificateValidityDate
+}
+
+CertificateValidityDate ::= CHOICE {
+	utcTime UTCTime,
+	generalTime GeneralizedTime
+}
+
+UniqueIdentifier ::= BIT STRING
+	SubjectPublicKeyInfo ::= SEQUENCE {
+	algorithm AlgorithmIdentifier,
+	subjectPublicKey BIT STRING
+}
+
+Extensions ::= SEQUENCE OF Extension
+Extension ::= SEQUENCE {
+	extnID OBJECT IDENTIFIER,
+	critical BOOLEAN DEFAULT FALSE,
+	extnValue OCTET STRING
+}
+
+#+END_SRC
+
+基于数字证书，我们可以再来看看Bob如何给Alice发送一份不可否认、不可篡改的文件：
+
+[[file:./images/bitcoin_sig_pubkey_08.png]]
+
+第一步：Bob除了对文件进行签名操作外，同时附加了自己的数字证书。一同发给Alice。
+
+[[file:./images/bitcoin_sig_pubkey_09.png]]
+
+第二步：Alice首先使用CA的公钥，对证书进行验证。如果验证成功，提取证书中的公钥，对Bob发来的文件进行验签。如果验证成功，则证明文件的不可否认和不可篡改。
+
+可以看到，基于数字证书后，Alice不在需要一个公钥库维护Bob（或其他人）的公钥证书，只要持有CA的公钥即可。数字证书在电子商务，电子认证等方面使用非常广泛，就如同计算机世界的身份证，可以证明企业、个人、网站等实体的身份。同时基于数字证书，加密算法的技术也可以支持一些安全交互协议（如SSL）。下一篇文章，将为大家介绍SSL协议的原理。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
