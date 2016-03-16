@@ -1,0 +1,12 @@
+#+title: spacemacs 安装
+
+** 首先安装emacs
+由于我是在macbook pro下，所以安装emacs-mac版本最好。如下安装即可：
+
+#+BEGIN_SRC bash
+
+$ brew tap railwaycat/homebrew-emacsmacport
+$ brew install emacs-mac --with-spacemacs-icon  # OR, brew cask install emacs-mac
+$ brew linkapps
+
+#+END_SRC

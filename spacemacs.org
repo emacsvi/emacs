@@ -1,0 +1,3 @@
+#+title: spacemacs
+
+- [[file:spacemacs_install.org][spacemacs安装]]
