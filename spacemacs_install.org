@@ -10,3 +10,56 @@ $ brew install emacs-mac --with-spacemacs-icon  # OR, brew cask install emacs-ma
 $ brew linkapps
 
 #+END_SRC
+
+
+** 安装spacemacs
+- If you have an existing Emacs configuration, back it up first:
+#+BEGIN_SRC bash
+
+cd ~
+mv .emacs.d .emacs.d.bak
+mv .emacs .emacs.bak
+
+#+END_SRC
+
+- clone spacemacs
+
+#+BEGIN_SRC bash
+
+git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d
+
+#+END_SRC
+
+- Launch Emacs. Spacemacs will automatically install the packages it requires. If you get an error regarding package downloads then you may try to disable the HTTPS protocol by starting Emacs with:
+
+#+BEGIN_SRC bash
+
+emacs --insecure
+
+#+END_SRC
+
+- Restart Emacs to complete the installation.
+
+
+** .spacemacs
+spacemacs将其配置为单独的单位，称为配置层。这些层相互叠加以实现自定义配置。
+默认情况下，spacemacs使用一个叫做 *~/.spacemacs* 的点文件来控制加载哪一个层，一个配置层是一个目录，其中至少含有一个 ~packages.el~ 文件，这个文件是从Emacs的内置包管理器中下载。
+如果你已经有自己的emacs配置，你可以把它移动到自己的层。
+
+- 自己以前的配置内容可以放在 *~/.spacemacs* 目录下的 ~(defun dotspacemacs/user-config ()~ 里面
+
+
+
+** 安装字体
+
+The default font used by Spacemacs is Source Code Pro by Adobe. It is recommended to install it on your system.
+
+To change the default font set the variable dotspacemacs-default-font in your *.spacemacs* file.
+
+** 创建自己的layer
+
+spacemacs的作者建议将自己的layers建立在private目录中，该目录不在作者的git版本管理中。当然，也可以按照自己的喜好指定个性化的目录。在此处，我使用了private目录。当指定其他目录时，需要在dotspacemacs-configuration-layer-path '(路径)设置路径创建新的layers也不需要自己从头写到尾，M-x，输入 layer/create 根据提示，得到命令.
+
+另外一定要在 *.spacemacs* 中开启自己的layer.
+
+

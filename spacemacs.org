@@ -1,3 +1,4 @@
 #+title: spacemacs
 
 - [[file:spacemacs_install.org][spacemacs安装]]
+- [[file:spacemacs_shortkey.org][spacemacs快捷键]]
