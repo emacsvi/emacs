@@ -1,0 +1,5 @@
+#+title: vim
+
+- [[file:vim_shortkey.org][vim命令备忘]]
+
+

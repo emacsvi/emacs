@@ -4,7 +4,10 @@ main index:
 
 - [[file:btc.org][Bitcoin]]
 - [[file:blog.org][Casual Readings]]
+- [[file:vim.org][vim]]
 - [[file:emacs.org][Emacs]]
+- [[file:mac.org][mac]]
+- [[file:mylife.org][生活]]
 - [[file:aboutme.org][About Me]]
 
 

@@ -1,0 +1,5 @@
+#+title: mac
+
+- [[file:macos_keyshort.org][os x 命令备忘]]
+
+
