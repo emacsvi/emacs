@@ -35,6 +35,7 @@
 **** 正则操作
 
 
+
 | 字符 | 解释                         |
 |------+------------------------------|
 | .    | 匹配换行符以外的任意字符     |
@@ -124,3 +125,139 @@ id 456
 #+END_SRC
 
 
+#+BEGIN_SRC c
+
+
+int main(int argc, char *argv[])
+{
+
+    for (i = 0; i < NOFILE; ++i)
+        close(i);
+
+    // occupy the first 3 fd
+    open("/dev/null", O_RDONLY);
+    open("/dev/null", O_WRONLY);
+    open("/dev/null", O_WRONLY);
+
+    // system("export LD_LIBRARY_PATH=/root/beap_gw/");
+    // system("echo $LD_LIBRARY_PATH");
+    // set the way to deal wtih the SIGPIPE signal
+    signal(SIGPIPE, SIG_IGN);
+
+    // kill all the subprocesses which occupy the port which
+    // beap_app_wj module should used to communicate with daemon.  
+    cleanStatSocket(6110);
+
+    // initialize all the semphore which used to protected
+    // some glocal variables.
+    if (sem_init(&select_cmd_sem, 0, 1) < 0)
+    {
+        perror("init select sem");
+        goto init_error;
+    }
+
+    if (sem_init(&recv_cmd_sem, 0, 1) < 0)
+    {
+        perror("init recv_cmd_sem");
+        goto init_error;
+    }
+
+
+    /*
+     * initialization the send_message mutex variable
+     * for mutex the send_wjpt()
+     */
+    pthread_mutex_init(&send_message_mutex, NULL);
+
+    handle_ctrl_global = NULL;
+
+    online_num = 0;
+    temp_file_num = 0;
+    guest_info_num = 0;
+
+    /* MAX_TEMP_FILE_NUM=32 but fixed 64 by liw*/
+    bzero(temp_file_name, MAX_TEMP_FILE_NUM * 128);
+
+    /* initialize BC_TRACE */
+    LS_MEM_CALLOC(pTLContext, 1, BCTraceLogContextStru);
+    if (!pTLContext)
+        goto init_error;
+
+    LS_MEM_CALLOC(pTLContext -> pBCTrace, 1, _BCTraceLog_t);
+    if (!pTLContext -> pBCTrace)
+        goto init_error;
+
+    LS_MEM_CALLOC(pTLContext -> pBCLog, 1, _BCTraceLog_t);
+    if (!pTLContext -> pBCTrace)
+        goto init_error;
+
+
+    /*
+     * get the print log path
+     * if has the '/data' partition and print to '/data'
+     * if not and print to '/var'
+     */
+    if (!access("/data/beap_gw/", F_OK))
+    {
+        BCTXT_SET_LOG_FILE_NAME(pTLContext,APP_DATA_WJ_LOG_FILENAME, 64000);
+        printf("data data data.\n");
+    }
+    else
+    {
+        BCTXT_SET_LOG_FILE_NAME(pTLContext,APP_VAR_WJ_LOG_FILENAME, 64000);
+        printf("var var var var.\n");
+    }
+
+    /* strcpy(pCharTLName, "GW wjdmn");*/
+    strcpy(pCharTLName, "wj");
+    /* BC_TRACE1(pTLContext, TL_WJ, "TRACE and LOG initialized",ARG0());*/
+    BC_LOG_CRIT(pTLContext, TL_WJ, "beap_app_wj commv0.0.0.2 (new version by 20130808) add oline-games upload function!", ARG0());
+    write_app_log("beap_app_wj start add micblog and wangwang upload function..");
+
+    /*
+     * find the global path
+     * check the /root/beap_gw/beap_gw_global.conf
+     */
+    if (!access(ENTERPRISE_GLOBAL_PATH, F_OK))
+        global_path_flag = 0;
+    else if (!access(HOTEL_GLOBAL_PATH, F_OK))
+        global_path_flag = 1;
+
+    read_global_info(&global_wjpt_info_var);
+
+    /* initialize the MIS and PCAM engine */
+
+    BTCTimerMgrInit(16);
+
+    /* register app_wj */
+    if (initEntLib() != BEAP_SUCCESS)
+    {
+        /* BC_TRACE1(pTLContext, TL_DAEMON, "ERROR: initialize ent lib FAILED!", NULL);*/
+        BC_LOG_CRIT(pTLContext, TL_DAEMON, "ERROR: initialize ent lib FAILED!", NULL);
+        goto init_error;
+    }
+
+    // GW_APP#10
+    if (PCAM_init(GW_APP_WJPT_NAME, FALSE) != e_BTC_SUCCESS)
+    {
+        /* BC_TRACE1(pTLContext, TL_DAEMON, "ERROR: initialize PCAM FAILED!", NULL);*/
+        BC_LOG_CRIT(pTLContext, TL_DAEMON, "ERROR: initialize PCAM FAILED!", NULL);
+        goto init_error;
+≈
+    }
+
+init_error:
+    pthread_mutex_destroy(&mutex_log_file);
+    printf("BA exit abnormally!\n");
+    return 1;
+}
+
+
+#+END_SRC
+
+
+~dada C-c C-t~ haha
+
+dada
+dddXSdkdk
+kdkd
