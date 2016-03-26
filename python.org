@@ -2,6 +2,6 @@
 
 - [[file:python_notes.org][python笔记]]
 - [[file:python_regex_string.org][python正则]]
-- [[python_file_api.org][file API]]
+- [[file:python_file_api.org][file API]]
 
 
