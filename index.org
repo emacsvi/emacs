@@ -7,6 +7,7 @@ main index:
 - [[file:vim.org][vim]]
 - [[file:emacs.org][Emacs]]
 - [[file:mac.org][mac]]
+- [[file:python.org][Python]]
 - [[file:mylife.org][生活]]
 - [[file:aboutme.org][About Me]]
 

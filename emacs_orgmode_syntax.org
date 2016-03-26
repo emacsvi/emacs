@@ -1,0 +1,79 @@
+#+title: orgmode 利用syntaxhighlighter着色
+
+**** 为什么要着色
+
+最近朋友看了下博客，说太丑了，代码都看不出来。于是.....好吧，弄个颜色上吧，但是一定要非常简洁。
+
+以至于我搞了一天的着色，可能在博客上并不明显，但是我却是遇到了一些总是解决了。
+
+在家边洗衣服边整这个。累死我了。
+
+**** 为什么要用syntaxhighlighter
+
+这个js插件很多年前弄过的，有印象，上手快。
+
+**** 步骤
+
+- 将http:www.orgmode.org上面的 ~wrong.css~ 复制到我的blog里面。修改下背景色背景图片就可以。
+- 将 ~wrong.css~ 里面的 ~code~ 修饰内容删除。因为它会与syntaxhighlighter里面的code冲突。
+- 将所有的js,css复制到自己的博客目录，然后在.emacs里面增加到每个页面。
+
+
+**** 问题
+
+着色的时候问题来了，在syntaxhighlighter里面是用 ~<pre class="brush: c;">~ 
+
+而在orgmode导出html后他的tag是 ~<pre class="src src-c">~
+
+这个整了许久没有办法，于是自己利用sed写了个脚本搞定。
+#+BEGIN_SRC bash
+
+sed -e 's/\<pre class=\"src src-\(.*\)/\<pre class=\"brush: \1/g' `grep '<pre class="src src-' -rl ./`
+
+#+END_SRC
+
+但是这个脚本由于sed机制原因，导致在脚本里面执行不太好。这几天在看python,于是用python写了个脚本，相当好使：
+#+BEGIN_SRC python
+
+#!/usr/bin/env python
+# -*- encoding:utf-8 -*-
+
+import os
+import re
+
+# open vim_shortkey.html
+def sed_pre(file_name):
+    fp = open(file_name, "r")
+    if fp:
+        content = fp.read()
+        fp.close()
+
+    # print content
+    p = re.compile(r'<pre\sclass="src\ssrc-(.*)', re.VERBOSE)
+    if p:
+        fp = open(file_name, "w")
+        fp.write(p.sub(r'<pre class="brush: \1', content))
+        fp.flush()
+        fp.close()
+
+for file_list in os.walk('/Users/liweilijie/repo/atom/www'):
+    for file_name in file_list[2]:
+        if re.search(r'.html$', file_name):
+            sed_pre(os.path.join(file_list[0], file_name))
+
+#+END_SRC
+
+
+**** syntaxhighlighter的一些设置
+
+[[http://www.cnblogs.com/heyuquan/archive/2012/09/28/2707632.html][defaults样式的一些设置]]
+
+#+BEGIN_SRC js
+
+SyntaxHighlighter.defaults['gutter'] = false;
+SyntaxHighlighter.defaults['toolbar'] = false;
+SyntaxHighlighter.defaults['smart-tabs'] = false;
+//……
+SyntaxHighlighter.all();
+
+#+END_SRC

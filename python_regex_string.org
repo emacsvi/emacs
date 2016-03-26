@@ -1,0 +1,5 @@
+#+title: python正则之字符串
+
+- [[http://wiki.ubuntu.org.cn/Python正则表达式操作指南][python正则表达式操作指南]]
+
+
