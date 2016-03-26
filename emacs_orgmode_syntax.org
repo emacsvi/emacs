@@ -41,21 +41,23 @@ sed -e 's/\<pre class=\"src src-\(.*\)/\<pre class=\"brush: \1/g' `grep '<pre cl
 import os
 import re
 
-# open vim_shortkey.html
+# sed_pre()函数将匹配class="src src-到的行替换为class="brush: 
+# 这样替换后就能正常着色了。
 def sed_pre(file_name):
-    fp = open(file_name, "r")
+    fp = open(file_name, "r") # 先读取文件内容
     if fp:
         content = fp.read()
         fp.close()
 
-    # print content
+    # 进行正则表达式编译,正则的时候一定要用raw格式
     p = re.compile(r'<pre\sclass="src\ssrc-(.*)', re.VERBOSE)
     if p:
         fp = open(file_name, "w")
-        fp.write(p.sub(r'<pre class="brush: \1', content))
+        fp.write(p.sub(r'<pre class="brush: \1', content)) # 写替换后的内容，如果没有替换则原样输出
         fp.flush()
         fp.close()
 
+# 对www目录下.html文件进行递归处理
 for file_list in os.walk('/Users/liweilijie/repo/atom/www'):
     for file_name in file_list[2]:
         if re.search(r'.html$', file_name):
