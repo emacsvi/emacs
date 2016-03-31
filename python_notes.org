@@ -1,2 +1,137 @@
 #+title: python笔记
 
+**** 切勿浮沙筑高台
+
+最近准备学习下python, 看了两三天book之后有种相见恨晚的冲动。
+
+不多说，像学习c一样，从基础打起，相信我会做得很好的。
+
+
+
+**** 基本语法学习
+
+- 如果你要指示某些不需要转义的特殊字符串，也就是我们常说的自然字符串，自然字符串通过给字符加上r或者R来指定。
+比如: r"New lines by \n"
+
+- unicode: r"this is a unicode string"
+
+- 字符串在一起会自动拼接。
+
+- 单引号与双引号的字符串的作用是一样的。
+
+- 一定要用自然字符串处理正则表达式，否则会使用很多反斜杠，例如，后向引用符可以写成'\\1'或者
+r'\1'
+
+
+- python里面everything is object。所有的东西都是对象，比如数，字符串等。
+
+- python中没有switch()语句，只能用if-elif-else来替换。但是有时候使用字典的方式会更加快捷。
+
+- while()有一个可选的else从包。例如下面的：
+
+#+BEGIN_SRC python
+
+#!/usr/bin/env python
+# -*- encoding:utf-8 -*-
+
+import random
+num = random.randint(1,5)
+running = True
+
+while running:
+    guest = int(raw_input('请输入猜测的数字：'))
+    if guest == num:
+        print('恭喜你，答对了。')
+        running = False
+    elif guest < num:
+        print('你输入的小了！')
+    else:
+        print('你输入的值太大了!')
+else:
+    print('over loop......')
+
+print('Done')
+
+
+#+END_SRC
+
+
+当while循环条件变为False的时候,else块才被执行——这甚至也可能是在条件第一次被检验的时 候。如果while循环有一个else从句,它将始终被执行,除非你的while循环将永远循环下去不会结 束!
+
+
+- range()内建函数
+
+我们所做的只是提供两个数,range 返回一个序列的数。这个序列从第一个数开始到第二个数为止。例 如,range(1,5)给出序列[1, 2, 3, 4]。默认地,range的步长为1。如果我们为range提供第 三个数,那么它将成为步长。例如,range(1,5,2)给出[1,3]。记住,range 向上 延伸到第二个 数,即它不包含第二个数。
+
+#+BEGIN_SRC python
+
+for i in range(1, 10, 2):
+    print i
+else:
+    print('the loop is over...')
+
+#+END_SRC
+
+
+- global用法
+
+如果你想要为一个定义在函数外的变量赋值,那么你就得告诉Python这个变量名不是局部的,而是 全局 的。我们使用global语句完成这一功能。没有global语句,是不可能为定义在函数外的变量赋值的。
+
+#+BEGIN_SRC python
+#!/usr/bin/env python
+# -*- encoding:utf-8 -*-
+
+def ff():
+    global x
+    print('x is %d' %(x)) # 50
+    x = 2
+    print('Change local x is %d' %(x)) #2
+
+x = 50
+
+ff()
+print('Done x is %d' %(x)) #2
+
+#+END_SRC
+
+- 关键参数
+默认参数只能从后往前定义，而关键参数则方便多了，不需要记哪个位置。
+
+#+BEGIN_SRC python
+
+#!/usr/bin/env python
+# -*- encoding:utf-8 -*-
+
+def func(a, b=5, c=10):
+    print('a is %d, b is %d, c is %d' %(a, b, c))
+    print('===========================')
+
+func(5)
+func(5,c=20)
+func(9, b=50)
+
+
+#+END_SRC
+
+结果:
+#+BEGIN_SRC bash
+
+python def_argument.py
+a is 5, b is 5, c is 10
+===========================
+a is 5, b is 5, c is 20
+===========================
+a is 9, b is 50, c is 10
+===========================
+
+#+END_SRC
+
+- return
+return可以返回函数，而且也会带参数或者不带参数
+
+注意,没有返回值的return语句等价于return None。None是Python中表示没有任何东西的特殊类 型。例如,如果一个变量的值为None,可以表示它没有值。
+
+- pass
+pass语句在Python中表示一个空的语句块。
+
+

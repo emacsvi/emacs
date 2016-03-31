@@ -1,5 +1,7 @@
 #+title: mac
 
 - [[file:macos_keyshort.org][os x 命令备忘]]
+- [[file:tmux.org][tmux]]
+- [[file:iterm2.org][iTerm2使用]]
 
 

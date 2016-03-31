@@ -1,0 +1,77 @@
+#+title: range()
+
+
+**** 说明
+
+- 函数原型：range（start， end， scan):
+
+- 参数含义：
+    + start:计数从start开始。默认是从0开始。例如range（5）等价于range（0， 5）;
+    + end:技术到end结束，但不包括end.例如：range（0， 5） 是[0, 1, 2, 3, 4]没有5
+    + scan：每次跳跃的间距，默认为1。例如：range（0， 5） 等价于 range(0, 5, 1)
+
+**** 例子
+
+#+BEGIN_SRC python
+
+#!/usr/bin/env python
+# -*- encoding:utf-8 -*-
+foo = 'abc'
+for i in range(len(foo)):
+    print foo[i], '(%d)' % i
+
+print range(0, 5)
+print range(5)
+print range(-5)
+print range(0, 5, 2)
+print range(0, -5 -2)
+
+lista = ['Jimny', 'C4L', 'BMWX5', 'G500', 'Rubicon']
+for i in range(len(lista)):
+    print('lista[%d]=%s' %(i, lista[i]))
+
+
+squared = [x ** 2 for x in range(4)]
+for i in squared:
+    print i
+
+print('####################')
+
+sqd = [x ** 2 for x in range(8) if not x % 2]
+for i in sqd:
+    print i
+
+
+#+END_SRC
+
+输出：
+
+#+BEGIN_SRC bash
+
+a (0)
+b (1)
+c (2)
+[0, 1, 2, 3, 4]
+[0, 1, 2, 3, 4]
+[]
+[0, 2, 4]
+[]
+lista[0]=Jimny
+lista[1]=C4L
+lista[2]=BMWX5
+lista[3]=G500
+lista[4]=Rubicon
+
+0
+1
+4
+9
+####################
+0
+4
+16
+36
+
+#+END_SRC
+
+
