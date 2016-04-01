@@ -7,5 +7,8 @@
 - [[file:python_id.org][python缓存对象]]
 - [[file:python_print.org][print]]
 - [[file:python_slice.org][切片]]
+- [[file:python_pexpect.org][pexpect]]
+
+
 
 
