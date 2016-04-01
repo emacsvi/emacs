@@ -5,5 +5,7 @@
 - [[file:python_file_api.org][file API]]
 - [[file:python_range.org][range]]
 - [[file:python_id.org][python缓存对象]]
+- [[file:python_print.org][print]]
+- [[file:python_slice.org][切片]]
 
 

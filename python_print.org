@@ -1,0 +1,77 @@
+#+title: print
+
+**** print
+
+由于新老版本的python都支持 *print('%s %d' %(s, i))* 这种格式的输出。所以我平时就用这种格式了。为了兼容。
+
+其实往往很多东西选择多了反而不太合适。明明简单的东西搞太复杂了。比如ruby.
+
+**** 格式化模板
+
+格式化字符串时，Python使用一个字符串作为 *模板* 。模板中有 *格式符* ，这些格式符为真实值预留位置，并说明真实数值应该呈现的格式。Python用一个tuple将多个值传递给模板，每个值对应一个格式符。
+
+比如下面的例子：
+#+BEGIN_SRC python
+print("I'm %s. I'm %d year old" % ('sbso', 99))
+#+END_SRC
+
+上面的例子中，
+
+- "I'm %s. I'm %d year old" 为我们的模板。 
+- *%s* 为第一个格式符，表示一个字符串。
+- *%d* 为第二个格式符，表示一个整数。
+- *('sbso', 99)* 的两个元素'sbso'和99为替换%s和%d的真实值。 
+- 在模板和tuple之间，有一个%号分隔，它代表了格式化操作。
+
+整个"I'm %s. I'm %d year old" % ('Vamei', 99) 实际上构成一个字符串表达式。我们可以像一个正常的字符串那样，将它赋值给某个变量。比如:
+
+#+BEGIN_SRC python
+a = "I'm %s. I'm %d year old" % ('Vamei', 99)
+print(a)
+#+END_SRC
+
+打印：
+#+BEGIN_SRC bash
+
+I'm sbso. I'm 99 year old
+
+#+END_SRC
+
+
+我们还可以用词典来传递真实值。如下：
+#+BEGIN_SRC python
+print("I'm %(name)s. I'm %(age)d year old" % {'name':'sbso', 'age':99})
+#+END_SRC
+
+打印：
+#+BEGIN_SRC bash
+I'm sbso. I'm 99 year old
+#+END_SRC
+
+可以看到，我们对两个格式符进行了 *命名* 。命名使用()括起来。每个命名对应词典的一个key。
+
+**** 控制格式符
+
+可以用如下的方式，对格式进行进一步的控制：
+
+*%[(name)][flags][width].[precision]typecode*
+
+- (name)为命名
+- flags可以有+,-,' '或0。+表示右对齐。-表示左对齐。' '为一个空格，表示在正数的左侧填充一个空格，从而与负数对齐。0表示使用0填充。
+- width表示显示宽度
+- precision表示小数点后精度
+
+#+BEGIN_SRC python
+
+print("%+10x" % 10)
+print("%04d" % 5)
+print("%6.3f" % 2.3)
+
+#+END_SRC
+
+上面的width, precision为两个整数。我们可以利用*，来动态代入这两个量。比如：
+#+BEGIN_SRC python
+print("%.*f" % (4, 1.2)) #Python实际上用4来替换*。所以实际的模板为"%.4f"。
+#+END_SRC
+
+
