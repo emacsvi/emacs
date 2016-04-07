@@ -3,5 +3,6 @@
 - [[file:macos_keyshort.org][os x 命令备忘]]
 - [[file:tmux.org][tmux]]
 - [[file:iterm2.org][iTerm2使用]]
+- [[file:mac_os_route.org][os x route静态路由]]
 
 

@@ -135,3 +135,27 @@ return可以返回函数，而且也会带参数或者不带参数
 pass语句在Python中表示一个空的语句块。
 
 
+list.sort()的参数有哪些，如此实现逆序 list.sort(reverse=True)
+
+list的拷贝
+list5 = list6[:]
+list7 = list6
+
+list5是深拷贝，而list7是浅拷贝
+list的加号与extend的区别。
+
+list有许多坑，很容易出错，一定要注意。明天深拷贝与浅拷贝。
+
+tuple
+tuple的标识是什么，你想不到，是个，
+比如t = (1)   type(t) = int
+t = ()  t = (1,)
+
+不能修改字符串：
+只能利用切片进行拷贝构造新的字符串。
+str1[:6] + 'hhaha' + str1[6:]
+
+
+
+
+

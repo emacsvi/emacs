@@ -1,0 +1,4 @@
+#+title: str.format()
+
+**** format()格式化字符串
+

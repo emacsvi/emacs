@@ -8,6 +8,7 @@
 - [[file:python_print.org][print]]
 - [[file:python_slice.org][切片]]
 - [[file:python_pexpect.org][pexpect]]
+- [[file:python_func_str.org][str方法]]
 
 
 
