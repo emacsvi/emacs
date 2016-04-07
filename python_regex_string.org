@@ -3,3 +3,65 @@
 - [[http://wiki.ubuntu.org.cn/Python正则表达式操作指南][python正则表达式操作指南]]
 
 
+**** 字符串的替换与修改
+
+re模块还提供了对字符串的替换和修改函数，他们比字符串对象提供的函数功能要强大一些。这几个函数是:
+
+#+BEGIN_SRC python
+#在目标字符串中规格规则查找匹配的字符串，再把它们替换成指定的字符串。你可以指定一个最多替换次数，否则将替换所有的匹配到的字符串。
+sub ( rule , replace , target [,count] )
+subn(rule , replace , target [,count] )
+#+END_SRC
+
+- 第一个参数是正则规则，
+- 第二个参数是指定的用来替换的字符串，
+- 第三个参数是目标字符串，
+- 第四个参数是最多替换次数。
+
+这两个函数的唯一区别是返回值。
+- sub返回一个被替换的字符串
+- subn返回一个元组，第一个元素是被替换的字符串，第二个元素是一个数字，表明产生了多少次替换。
+
+例，将下面字符串中的’dog’全部替换成’cat’
+#+BEGIN_SRC python
+>>> s=’ I have a dog , you have a dog , he have a dog ‘
+>>> re.sub( r’dog’ , ‘cat’ , s )
+' I have a cat , you have a cat , he have a cat '
+#+END_SRC
+
+如果我们只想替换前面两个，则
+#+BEGIN_SRC python
+>>> re.sub( r’dog’ , ‘cat’ , s , 2 )
+' I have a cat , you have a cat , he have a dog '
+
+#+END_SRC
+
+或者我们想知道发生了多少次替换，则可以使用subn:
+#+BEGIN_SRC python
+>>> re.subn( r’dog’ , ‘cat’ , s )
+(' I have a cat , you have a cat , he have a cat ', 3)
+
+
+#+END_SRC
+
+**** 切片函数
+*split(rule, target [,maxsplit] )*
+
+切片函数。使用指定的正则规则在目标字符串中查找匹配的字符串，用它们作为分界，把字符串切片。
+
+- 第一个参数是正则规则，
+- 第二个参数是目标字符串，
+- 第三个参数是最多切片次数
+- 返回一个被切完的子字符串的列表
+
+这个函数和str对象提供的split函数很相似。举个例子，我们想把上例中的字符串被’,’分割开，同时要去掉逗号前后的空格
+#+BEGIN_SRC python
+>>> s=’ I have a dog , you have a dog , he have a dog ‘
+>>> re.split( ‘\s*,\s*’ , s )
+[' I have a dog', 'you have a dog', 'he have a dog ']
+#+END_SRC
+
+结果很好。如果使用str对象的split函数，则由于我们不知道’,’两边会有多少个空格，而不得不对结果再进行一次处理。
+
+
+

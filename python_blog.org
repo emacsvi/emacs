@@ -1,0 +1,117 @@
+#+title: 博客搭建的python脚本
+
+**** 故事开始
+
+我的博客用emacs写的org文档。而这种文档导出来之后放在github上其界面太丑了。
+
+于是我增加了css，又增加了syntaxhighlighter功能。这时候要解决syntaxhightlighter标签与org导出标签冲突的问题。
+
+我将其利用python写了个脚本。自动将标签转化过来。
+
+后来在配置syntaxhighlighter的时候发现太多js了，我用不了，而且会影响网页效率。
+
+于是又增加了一个功能是grep每个html文件，用到哪个js再在html头上增加上对应的js即可。。
+
+
+**** py脚本
+
+#+BEGIN_SRC python
+#!/usr/bin/env python
+# -*- encoding:utf-8 -*-
+
+import os
+import re
+
+brush_dict = {'c':'Cpp',\
+              'cpp':'Cpp',\
+              'css':'Css',\
+              'bash':'Bash',\
+              'shell':'Bash',\
+              'perl':'Perl',\
+              'python':'Python',\
+              'js':'JScript',\
+              'java':'Java',\
+              'php':'Php',\
+              'text':'Plain',\
+              'ruby':'Ruby',\
+              'sql':'Sql',\
+              'xml':'Xml'}
+
+brush_js_dict = {}
+
+def get_js_file(content):
+    p = re.compile(r'<pre\sclass="src\ssrc-(\w+).*', re.VERBOSE)
+    # print(p.findall(content))
+    result_list = p.findall(content)
+    for i in result_list:
+        #print i
+        brush_js_dict[i] = brush_dict[i]
+
+    #for i in brush_js_dict.keys():
+        #print '%s=>%s' % (i, brush_js_dict[i])
+    #return brush_js_dict
+
+
+# <script type="text/javascript" src="scripts/shCore.js"></script>
+# write the content: <script type=\"text/javascript\" src=\"../scripts/shBrushPerl.js\"></script>
+def write_js_to_file(content):
+    s = r''
+    for i in brush_js_dict.keys():
+        s += r'<script type="text/javascript" src="scripts/shBrush%s.js"></script>\n' % brush_js_dict[i]
+    print s
+    content = re.sub(r'(src="scripts/shCore.js.*)', r'\1\n%s' % s, content, 1)
+    return content
+
+# open vim_shortkey.html
+def sed_pre(file_name):
+    fp = open(file_name, "r")
+    if fp:
+        content = fp.read()
+        fp.close()
+
+    get_js_file(content)
+
+    content = write_js_to_file(content)
+
+    p = re.compile(r'<pre\sclass="src\ssrc-(.*)', re.VERBOSE)
+    if p:
+        fp = open(file_name, "w")
+        fp.write(p.sub(r'<pre class="brush: \1', content))
+        fp.flush()
+        fp.close()
+
+for file_list in os.walk('/Users/liweilijie/repo/atom/www'):
+    for file_name in file_list[2]:
+        if re.search(r'.html$', file_name):
+            print os.path.join(file_list[0], file_name)
+            sed_pre(os.path.join(file_list[0], file_name))
+
+
+
+#+END_SRC
+
+
+虽然没有注释，应该不难看明白吧。
+
+**** shell自动上传到github上
+
+#+BEGIN_SRC bash
+
+#!/usr/bin/sh
+cd /Users/liweilijie/repo/atom/pages
+git add .
+git commit -a -m "`date` by mac os x"
+git push origin master
+echo "pages success..."
+
+python /Users/liweilijie/upload_github.py
+echo "htmlize over..."
+cd /Users/liweilijie/repo/atom/www
+git add .
+git commit -a -m "`date` by mac os x"
+git push origin master
+echo "www success..."
+
+
+#+END_SRC
+

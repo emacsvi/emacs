@@ -1,5 +1,6 @@
 #+title: python-相见恨晚
 
+- [[file:python_blog.org][博客搭建的python脚本]]
 - [[file:python_notes.org][python笔记]]
 - [[file:python_regex_string.org][python正则]]
 - [[file:python_file_api.org][file API]]

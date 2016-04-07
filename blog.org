@@ -2,5 +2,6 @@
 
 ** 2016
 - 201602 [[file:./note/switch_road.org][未选择的路]]
+- 201604 [[file:./note/20160407_quite_myjob.org][专注]]
 
 
