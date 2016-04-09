@@ -1,0 +1,101 @@
+#+title: python字符串连接的4种方法
+
+**** 四种方法
+
+~1. 直接通过加号(+)操作符连接~
+
+#+BEGIN_SRC python
+website = 'www.' + 'emacsvi' + '.com'
+#+END_SRC
+
+~2. join方法~
+
+#+BEGIN_SRC python
+lista = ['www.', 'emacs', '.com'] 
+website = ''.join(lista) # www.emacs.com
+website = '#'.join(lista) # www.#emacs.#com
+#+END_SRC
+
+~3. 替换~
+
+#+BEGIN_SRC python
+website = '%s%s%s' % ('www.', 'emacs', '.com')
+#+END_SRC
+
+~4. format~
+
+......
+
+**** 说下前三种方法不同
+
+- 方法1， *+* 使用简单直接，但是网上不少人说这种方法效率低之所以说python 中使用 *+* 进行字符串连接的操作效率低下，是因为python中字符串是不可变的类型，使用 *+* 连接两个字符串时会生成一个新的字符串，生成新的字符串就需要重新申请内存，当连续相加的字符串很多时(a+b+c+d+e+f+...) ，效率低下就是必然的了。
+
+- 方法2， *join()* 使用略复杂，但对多个字符进行连接时效率高，只会有一次内存的申请。而且如果是对list的字符进行连接的时候，这种方法必须是首选.
+
+- 方法3： *%* 字符串格式化，这种方法非常常用，本人也推荐使用该方法。
+
+
+**** 下面用实验来说明字符串连接的效率问题。
+
+#+BEGIN_SRC text
+比较对象：加号连接 VS join连接
+python版本： python2.7
+系统环境：CentOS
+#+END_SRC
+
+****** 实验一：
+
+#+BEGIN_SRC python
+# -*- coding: utf-8 -*-
+from time import time
+def method1():
+    t = time()
+    for i in xrange(100000):
+        s = 'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'+'pythontab'
+    print time() - t
+def method2():
+    t = time()
+    for i in xrange(100000):
+        s = ''.join(['pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab','pythontab'])
+    print time() -t
+method1()
+method2()
+
+#+END_SRC
+
+
+结果：
+#+BEGIN_SRC bash
+0.641695976257
+0.341440916061
+#+END_SRC
+
+****** 实验二：
+#+BEGIN_SRC python
+# -*- coding: utf-8 -*-
+from time import time
+def method1():
+    t = time()
+    for i in xrange(100000):
+        s = 'pythontab'+'pythontab'+'pythontab'+'pythontab'
+    print time() - t
+def method2():
+    t = time()
+    for i in xrange(100000):
+        s = ''.join(['pythontab','pythontab','pythontab','pythontab'])
+    print time() -t
+method1()
+method2()
+#+END_SRC
+
+结果:
+#+BEGIN_SRC text
+0.0265691280365
+0.0522091388702
+
+#+END_SRC
+
+上面两个实验出现了完全不同的结果，分析这两个实验唯一不同的是：字符串连接个数。
+
+*结论：加号连接效率低是在连续进行多个字符串连接的时候出现的，如果连接的个数较少，加号连接效率反而比join连接效率高*
+

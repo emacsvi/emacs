@@ -10,6 +10,8 @@
 - [[file:python_slice.org][切片]]
 - [[file:python_pexpect.org][pexpect]]
 - [[file:python_func_str.org][str方法]]
+- [[file:python_configparser.org][ConfigParser模块]]
+- [[file:python_join_string.org][python字符串连接]]
 
 
 

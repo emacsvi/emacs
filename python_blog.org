@@ -20,76 +20,124 @@
 # -*- encoding:utf-8 -*-
 
 import os
-import re
+import sys
+import pexpect
+import time
+import ConfigParser
 
-brush_dict = {'c':'Cpp',\
-              'cpp':'Cpp',\
-              'css':'Css',\
-              'bash':'Bash',\
-              'shell':'Bash',\
-              'perl':'Perl',\
-              'python':'Python',\
-              'js':'JScript',\
-              'java':'Java',\
-              'php':'Php',\
-              'text':'Plain',\
-              'ruby':'Ruby',\
-              'sql':'Sql',\
-              'xml':'Xml'}
+config_file_name = 'config_vpn.conf'
+net_info = {'local_gw':'192.168.1.1',\
+        'local_netmask':'255.255.255.0',\
+        'net':'119.119.109.25',\
+        'net_netmask':'255.255.255.255',\
+        'net_gw':'192.168.0.1'}
 
-brush_js_dict = {}
+def get_network_info():
+    conf = ConfigParser.ConfigParser()
+    conf.read(config_file_name)
+    global net_info
 
-def get_js_file(content):
-    p = re.compile(r'<pre\sclass="src\ssrc-(\w+).*', re.VERBOSE)
-    # print(p.findall(content))
-    result_list = p.findall(content)
-    for i in result_list:
-        #print i
-        brush_js_dict[i] = brush_dict[i]
-
-    #for i in brush_js_dict.keys():
-        #print '%s=>%s' % (i, brush_js_dict[i])
-    #return brush_js_dict
+    '''
+        [local]
+        local_gw = 192.168.1.1
+        local_netmask = 255.255.255.0
+        [net]
+        net = 119.119.109.25
+        net_netmask = 255.255.255.255
+        net_gw = 192.168.0.1
+    '''
+    # get the name of section
+    local_gw = conf.get('local', 'local_gw')
+    net_info['local_gw'] = local_gw
 
 
-# <script type="text/javascript" src="scripts/shCore.js"></script>
-# write the content: <script type=\"text/javascript\" src=\"../scripts/shBrushPerl.js\"></script>
-def write_js_to_file(content):
-    s = r''
-    for i in brush_js_dict.keys():
-        s += r'<script type="text/javascript" src="scripts/shBrush%s.js"></script>\n' % brush_js_dict[i]
-    print s
-    content = re.sub(r'(src="scripts/shCore.js.*)', r'\1\n%s' % s, content, 1)
-    return content
+    local_netmask = conf.get('local', 'local_netmask')
+    net_info['local_netmask'] = local_netmask
 
-# open vim_shortkey.html
-def sed_pre(file_name):
-    fp = open(file_name, "r")
-    if fp:
-        content = fp.read()
-        fp.close()
 
-    get_js_file(content)
+    net = conf.get('net', 'net')
+    net_info['net'] = net
 
-    content = write_js_to_file(content)
+    net_netmask = conf.get('net', 'net_netmask')
+    net_info['net_netmask'] = net_netmask
 
-    p = re.compile(r'<pre\sclass="src\ssrc-(.*)', re.VERBOSE)
-    if p:
-        fp = open(file_name, "w")
-        fp.write(p.sub(r'<pre class="brush: \1', content))
-        fp.flush()
-        fp.close()
+    net_gw = conf.get('net', 'net_gw')
+    net_info['net_gw'] = net_gw
 
-for file_list in os.walk('/Users/liweilijie/repo/atom/www'):
-    for file_name in file_list[2]:
-        if re.search(r'.html$', file_name):
-            print os.path.join(file_list[0], file_name)
-            sed_pre(os.path.join(file_list[0], file_name))
+def config_route(net_info):
+    if os.sys.platform == 'darwin':
+        print '=====mac os X platform...'
+        os.system('route -n add -net %s -netmask %s %s' % (net_info['net'], net_info['net_netmask'], net_info['local_gw']))
+        os.system('route -n delete default')
+        os.system('route -n add default %s' % (net_info['net_gw']))
+        print '=====mac os X set success.....'
+    else:
+        print '=====unix platform....'
+        os.system('route add -net %s netmask %s gw %s', net_info['net'], net_info['net_netmask'], net_info['local_gw'])
 
+        os.system('route del -net default')
+        os.system('route del -net 0.0.0.0')
+        os.system('route add default gw %s' % (net_info['net_gw']))
+
+# 2. open the vpn 'openvpn /etc/openvpn/client.ovpn'
+
+if __name__ == '__main__':
+    login_password = '*******'
+    os.system('killall -9 openvpn')
+    global net_info
+
+    get_network_info()
+    print('=======================')
+    for i in net_info.keys():
+        print('%s=>%s' % (i, net_info[i]))
+
+    # cmd = 'openvpn --config /etc/openvpn/client.ovpn --ca /etc/openvpn/ca.crt \
+    #        --cert /etc/openvpn/liwei.crt --key /etc/openvpn/liwei.key \
+    #        --tls-auth /etc/openvpn/ta.key'
+    cmd = '/usr/local/sbin/openvpn \
+            --config /Users/liweilijie/software/liwei/client.ovpn \
+            --ca /Users/liweilijie/software/liwei/ca.crt \
+            --cert /Users/liweilijie/software/liwei/liwei.crt \
+            --key /Users/liweilijie/software/liwei/liwei.key \
+            --tls-auth /Users/liweilijie/software/liwei/ta.key'
+    child = pexpect.spawn(cmd, timeout=10)
+    child.logfile = sys.stdout
+    print child.before
+    while True:
+        index = child.expect(['.* Password.*', pexpect.EOF, pexpect.TIMEOUT])
+        if index == 0:
+            child.sendline(login_password)
+            print '=====password send ok============'
+            index = child.expect(['.* Completed.*', pexpect.EOF, pexpect.TIMEOUT])
+            while True:
+                if index == 0:
+                    print '======Completed ok=========='
+                    config_route(net_info)
+                    break
+                else:
+                    print '===wait wait wait wait wait.....==='
+                    time.sleep(5)
+        else:
+            pass
 
 
 #+END_SRC
 
+
+这里第一个函数会去读取配置文件，因为有时候我会在家里用，有时候可能会在大丰那边用。
+
+我抱着笔记本到处跑。所以写了个配置文件保存本地网关的信息。
+
+#+BEGIN_SRC text
+[local]
+local_gw = 192.168.9.1
+local_netmask = 255.255.255.0
+[net]
+net = 119.119.109.25
+net_netmask = 255.255.255.255
+net_gw = 192.168.0.1
+
+#+END_SRC
 
 虽然没有注释，应该不难看明白吧。
 
