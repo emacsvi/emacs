@@ -440,3 +440,116 @@ cc.at('0x7f8dcf9fbbd0241325d5b32b847dac61e276e508').get_tk()
 
 #+END_SRC
 
+
+
+****** 一些常用的方法
+
+#+BEGIN_SRC bash
+
+# 查看所有帐号
+> eth.accounts
+['0x407d73d8a49eeb85d32cf465507dd71d507100c1']
+
+# 这个是创世块的地址，如果是私链就是自己的第一个帐户地址
+> eth.coinbase
+
+# To check your the etherbase account balance:
+# 查看你帐号上的地址，换成以太币打印出来
+> web3.fromWei(eth.getBalance(eth.coinbase), "ether")
+6.5
+
+#+END_SRC
+
+打印钱包里面的钱
+#+BEGIN_SRC javascript
+// Print all balances with a JavaScript function:
+// 打印所有的钱包里面有多少钱
+
+function checkAllBalances() { 
+var i =0; 
+eth.accounts.forEach( function(e){
+    console.log("  eth.accounts["+i+"]: " +  e + " \tbalance: " + web3.fromWei(eth.getBalance(e), "ether") + " ether"); 
+i++; 
+})
+}; 
+
+#+END_SRC
+
+结果查看
+#+BEGIN_SRC bash
+# That can then be executed with:
+
+> checkAllBalances();
+  eth.accounts[0]: 0xd1ade25ccd3d550a7eb532ac759cac7be09c2719   balance: 63.11848 ether
+  eth.accounts[1]: 0xda65665fc30803cb1fb7e6d86691e20b1826dee0   balance: 0 ether
+  eth.accounts[2]: 0xe470b1a7d2c9c5c6f03bbaa8fa20db6d404a0c32   balance: 1 ether
+  eth.accounts[3]: 0xf4dd5c3794f1fd0cdc0327a83aa472609c806e99   balance: 6 ether
+#+END_SRC
+
+
+*loadScript()*
+上面的checkAllBalances()函数可以保存在一个js文件这中。然后利用loadScript()来调用。
+
+#+BEGIN_SRC javascript
+> loadScript("/Users/liweilijie/gethload.js")
+true
+#+END_SRC 
+
+*miner.start(4)* 4个线程来挖矿
+
+#+BEGIN_SRC bash
+# With the number of THREADS as an arguments:
+> miner.start(4)
+
+> miner.stop(1)
+
+#+END_SRC
+
+
+****** personal
+
+
+#+BEGIN_SRC javascript
+
+// List all accounts
+personal.listAccounts
+// Return: collection with accounts
+
+
+// Create a new password protected account
+personal.newAccount(passwd)
+
+// 创建帐号
+personal.newAccount("mypasswd")
+
+// 删除帐号
+personal.deleteAccount
+personal.deleteAccount(addr, passwd)
+// 例子
+personal.deleteAccount(eth.coinbase, "mypasswd")
+
+
+// Unlock the account with the given address, password and an optional duration (in seconds)
+personal.unlockAccount(addr, passwd, duration)
+// return: boolean indication if the account was unlocked
+// Example
+personal.unlockAccount(eth.coinbase, "mypasswd", 300)
+
+
+#+END_SRC
+
+
+****** admin
+
+#+BEGIN_SRC javascript
+
+> admin.datadir
+"/tmp/eth/60/01"
+
+#+END_SRC
+
+一个地址给另外一个地址转钱：
+
+#+BEGIN_SRC javascript
+eth.sendTransaction({from: '0xaaa..', to: '0xbbb..', value: web3.toWei(1, "ether")})
+#+END_SRC
