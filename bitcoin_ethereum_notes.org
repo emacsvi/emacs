@@ -1,0 +1,442 @@
+#+title: 以太坊研究备忘
+
+**** geth命令
+
+| 命令                                                | 描述                                       |
+|-----------------------------------------------------+--------------------------------------------|
+| geth account new                                    | 创建一个帐号                               |
+| geth account list                                   | 查询已经创建的帐户                         |
+| keystore                                            | 里面是帐户信息                             |
+| web3.fromWei(eth.getBalance(eth.coinbase), "ether") | 查询帐户信息，只有有钱的用户才能查到       |
+| geth wallet import ethereum-wallet-8936xxxxxx.json  | 导入预售钱包地址                           |
+| geth console                                        | 客户端终端                                 |
+| geth --networkid “a”                              | a为网络id （输入>2的任意数字即可启动私链） |
+| geth --testnet                                      | 连接到以太坊测试链                         |
+| geth --rpc                                          | 启动HTTP-RPC服务                           |
+| geth --rpccorsdomain                                | 设置请求ip白名单 * 为所有                  |
+| geth --networkid "888" --rpccorsdomain="*" --rpc    | 常用组合命令                               |
+|                                                     |                                            |
+
+**** JavaScript控制台常用命令
+
+| 命令                                                                                         | 描述                                           |
+|----------------------------------------------------------------------------------------------+------------------------------------------------|
+| admin.nodeInfo                                                                               | 查询当前节点信息                               |
+| admin.peers                                                                                  | 查询已连接的节点信息                           |
+| etc.accounts                                                                                 | 查询账户列表信息                               |
+| personal.newAccount(“123456")                                                               | 创建新的账户 123456 为密码                     |
+| personal.unlockAccount(‘0xaaa…’, '123456', 1000)                                          | 解锁账户0xaaa… 密码为 123456  解锁时间  1000s |
+| eth.getBalance(‘0xaaa…’)                                                                  | 查询账户以太币信息                             |
+| eth.sendTransaction({from: ‘0xaaa…’, to: ‘0xbbb..’, value: web3.toWei(100,  “ether")}) | 发送以太币  从0xaaa...给 0xbbb…               |
+|                                                                                              |                                                |
+
+
+**** 常用js方法
+
+查询所有账户以太币信息
+#+BEGIN_SRC js
+
+function checkAllBalances() { var i =0;
+
+web3.eth.accounts.forEach( function(e){
+
+console.log("eth.accounts["+i+"]: " +  e + "\tbalance:
+
+"+web3.fromWei(web3.eth.getBalance(e), "ether") + " ether"); i++; })};
+
+#+END_SRC
+
+1. eth.sendTransaction()
+#+BEGIN_SRC js
+
+假如你想从自己的地址0x036a03fc47084741f83938296a1c8ef67f6e34fa发生1个以太币到收款方地址 0x893608751d68d046e85802926673cdf2f57f7cb8，输入eth.sendTransaction({from: '0x036a03fc47084741f83938296a1c8ef67f6e34fa', to: '0x893608751d68d046e85802926673cdf2f57f7cb8', value: web3.toWei(1, "ether")})，回车。输入以上命令后，会出现如下界面，不是错误，回车即可。注意，一定要在地址前面加上0x前缀。
+
+#+END_SRC
+
+
+
+挖矿能解决一切事情。
+
+**** 搭建环境
+
+这里先搭建环境，2个节点互相连接然后通信。在A节点上生成一个智能合约发布到私有链上，然后再到B节点上利用A节点的合约进行设置一些功能。调用A节点的方法。
+
+参考例子：
+- [[https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console][js的代码]]
+- [[http://ethfans.org/topics/176][ethereum-bootstrap]]
+- [[http://8btc.com/thread-29538-1-1.html][geth有关json文件用法]]
+- [[http://ethfans.org/topics/175][solidily简单语法]]
+- [[https://github.com/OneEther/OneThousand/blob/master/onethousand.sol][投票]]
+- [[https://github.com/ethereum/go-ethereum/wiki/Setting-up-private-network-or-local-cluster][设置私链]]
+- [[https://github.com/ethereum/go-ethereum/wiki/Contracts-and-Transactions#contract-info-metadata][transaction]]
+
+****** 在A节点上启动私链
+
+
+#+BEGIN_SRC bash
+# 创建数据目录，如果之前有的话请先删除再重新创建
+mkdir -p /tmp/eth/60/01
+
+geth --datadir="/tmp/eth/60/01" --genesis ./genesis.json --networkid "31415929" --ipcdisable --port 30301 --rpcport 8101 console
+
+#+END_SRC
+
+ 
+*genesis.json* 文件必须要有，如果没有的话，后面挖矿会失败，因为这里有创世块的信息，当然这几个地址我并不想用。我在里面自己创建地址来用的。不用它固定的地址也可以。
+
+#+BEGIN_SRC text
+
+{
+  "alloc": {
+    "3ae88fe370c39384fc16da2c9e768cf5d2495b48": {
+      "balance": "1000000000000000000000000000000"
+    },
+    "81063419f13cab5ac090cd8329d8fff9feead4a0": {
+      "balance": "2000000000000000000000000000000"
+    },
+    "9da26fc2e1d6ad9fdd46138906b0104ae68a65d8": {
+      "balance": "3000000000000000000000000000000"
+    },
+    "bd2d69e3e68e1ab3944a865b3e566ca5c48740da": {
+      "balance": "4000000000000000000000000000000"
+    },
+    "ca9f427df31a1f5862968fad1fe98c0a9ee068c4": {
+      "balance": "5000000000000000000000000000000"
+    }
+  },
+
+  "nonce": "0x0000000000000042",
+  "difficulty": "0x020000",
+  "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "coinbase": "0x0000000000000000000000000000000000000000",
+  "timestamp": "0x00",
+  "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "extraData": "0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa",
+  "gasLimit": "0x4c4b40"
+}
+
+#+END_SRC
+
+运行起来后，自己创建一个帐号来用，可以做如下操作：
+#+BEGIN_SRC bash
+> admin.nodeInfo
+{
+  enode: "enode://fc74e3a60b5da1046828fa5a68c618c31f94ad29b3165c694ee0a8e3cab99390548ce463cfecbba62e0c9f71f3a906bce9f7f29ef90d9915f1273a30eacac515@0.0.0.0:30301",
+  id: "fc74e3a60b5da1046828fa5a68c618c31f94ad29b3165c694ee0a8e3cab99390548ce463cfecbba62e0c9f71f3a906bce9f7f29ef90d9915f1273a30eacac515",
+  ip: "0.0.0.0",
+  listenAddr: "[::]:30301",
+  name: "Geth/v1.3.6-9e323d65/linux/go1.5.1",
+  ports: {
+    discovery: 30301,
+    listener: 30301
+  },
+  protocols: {
+    eth: {
+      difficulty: 131072,
+      genesis: "19425866b7d3298a15ad79accf302ba9d21859174e7ae99ce552e05f13f0efa3",
+      head: "19425866b7d3298a15ad79accf302ba9d21859174e7ae99ce552e05f13f0efa3",
+      network: 31415929
+    }
+  }
+}
+> personal.newAccount("129129")
+"0x6b1a547c422f823ee2f9e9dc2171e254948f7846"
+> personal.listAccounts
+["0x6b1a547c422f823ee2f9e9dc2171e254948f7846"]
+
+
+> admin.peers
+[]
+> net.peerCount
+0
+
+#+END_SRC
+
+
+以上在A节点上创建私链就完成了。
+
+****** 在A节点上写智能合约
+
+这里我们写了一个get,set方法的示例,代码如下：
+
+#+BEGIN_SRC cpp
+contract Token {
+    address issuer;
+    uint public tk;
+    mapping (address => uint) balances;
+    event Issue(address account, uint amount);
+    event Transfer(address from, address to, uint amount);
+    function Token() {
+        issuer = msg.sender;
+    }      
+    function issue(address account, uint amount) {
+        if (msg.sender != issuer) throw;
+        balances[account] += amount;
+    }      
+    function transfer(address to, uint amount) {
+        if (balances[msg.sender] < amount) throw;
+        balances[msg.sender] -= amount;
+        balances[to] += amount;
+        Transfer(msg.sender, to, amount);
+    }      
+    function getBalance(address account) constant returns (uint) {
+        return balances[account];
+    } 
+    function set_tk(uint a) public {
+        tk += a;
+    }
+    function get_tk() public constant returns (uint) {
+        return tk;
+    }
+}
+
+#+END_SRC
+
+第一步，我们先把合约代码压缩为一行．：`cat contracts/Token.sol | tr '\n' ' '`
+
+切换到以太坊控制台，把合约代码保存为一个变量:
+
+
+#+BEGIN_SRC cpp
+var tokenSource = 'contract Token {     address issuer;     mapping (address => uint) balances;      event Issue(address account, uint amount);     event Transfer(address from, address to, uint amount);      function Token() {         issuer = msg.sender;     }      function issue(address account, uint amount) {         if (msg.sender != issuer) throw;         balances[account] += amount;     }      function transfer(address to, uint amount) {         if (balances[msg.sender] < amount) throw;          balances[msg.sender] -= amount;         balances[to] += amount;          Transfer(msg.sender, to, amount);     }      function getBalance(address account) constant returns (uint) {         return balances[account];     } }';
+#+END_SRC
+
+然后编译合约代码：
+
+#+BEGIN_SRC cpp
+var tokenCompiled = web3.eth.compile.solidity(tokenSource);
+#+END_SRC
+
+通过 *kenCompiled.Token.code* 可以看到编译好的二进制代码，
+
+通过 *tokenCompiled.Token.info.abiDefinition* 可以看到合约的[[https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI][ABI]]
+
+接下来我们要把编译好的合约部署到网络上去．
+
+首先我们用ABI来创建一个javascript环境中的合约对象：
+
+#+BEGIN_SRC cpp
+var contract = web3.eth.contract(tokenCompiled.Token.info.abiDefinition);
+#+END_SRC
+
+
+我们通过合约对象来部署合约：
+
+#+BEGIN_SRC cpp
+var initializer = {from: web3.eth.accounts[0], data: tokenCompiled.Token.code, gas: 300000};
+
+var callback = function(e, contract){
+    if(!e) {
+      if(!contract.address) {
+        console.log("Contract transaction send: TransactionHash: " + contract.transactionHash + " waiting to be mined...");
+      } else {
+        console.log("Contract mined!");
+        console.log(contract);
+      }
+    }
+};
+
+var token = contract.new(initializer, callback);
+
+#+END_SRC
+
+- *contract.new* 方法的第一个参数设置了这个新合约的创建者地址 *from* , 这个新合约的代码 *data*, 和用于创建新合约的费用 *gas* ．
+- *gas* 是一个估计值，只要比所需要的gas多就可以，合约创建完成后剩下的gas会退还给合约创建者．
+- *contract.new* 方法的第二个参数设置了一个回调函数，可以告诉我们部署是否成功．
+- *contract.new* 执行时会提示输入钱包密码．执行成功后，我们的合约Token就已经广播到网络上了．此时只要等待矿工把我们的合约打包保存到以太坊区块链上，部署就完成了．
+
+在公有链上，矿工打包平均需要15秒，在私有链上，我们需要自己来做这件事情．首先开启 *挖矿* ：
+
+#+BEGIN_SRC cpp
+miner.start(1)
+#+END_SRC
+
+
+此时需要等待一段时间，以太坊节点会生成挖矿必须的数据，这些数据都会放到内存里面．在数据生成好之后，挖矿就会开始，稍后就能在控制台输出中看到类似：
+
+#+BEGIN_SRC cpp
+Constract Mined
+#+END_SRC
+
+的信息，这说明挖到了一个块，合约已经部署到以太坊网络上了！此时我们可以把挖矿关闭：
+
+
+#+BEGIN_SRC cpp
+miner.stop(1)
+#+END_SRC
+
+接下来我们就可以调用合约了．先通过 *token.address* 获得合约部署到的地址, 以后新建合约对象时可以使用．这里我们直接使用原来的contract对象：
+
+
+#+BEGIN_SRC cpp
+// 本地钱包的第一个地址所持有的token数量
+> token.getBalance(web3.eth.accounts[0])
+0
+
+// 发行100个token给本地钱包的第一个地址
+> token.issue.sendTransaction(web3.eth.accounts[0], 100, {from: web3.eth.accounts[0]});
+I1221 11:48:30.512296   11155 xeth.go:1055] Tx(0xc0712460a826bfea67d58a30f584e4bebdbb6138e7e6bc1dbd6880d2fce3a8ef) to: 0x37dc85ae239ec39556ae7cc35a129698152afe3c
+"0xc0712460a826bfea67d58a30f584e4bebdbb6138e7e6bc1dbd6880d2fce3a8ef"
+
+// 发行token是一个transaction, 因此需要挖矿使之生效
+> miner.start(1)
+:hammer:Mined block
+> miner.stop(1)
+
+// 再次查询本地钱包第一个地址的token数量
+> token.getBalance(web3.eth.accounts[0])
+100
+
+// 从第一个地址转30个token给本地钱包的第二个地址
+> token.transfer.sendTransaction(web3.eth.accounts[1], 30, {from: web3.eth.accounts[0]})
+I1221 11:53:31.852541   11155 xeth.go:1055] Tx(0x1d209cef921dea5592d8604ac0da680348987b131235943e372f8df35fd43d1b) to: 0x37dc85ae239ec39556ae7cc35a129698152afe3c
+"0x1d209cef921dea5592d8604ac0da680348987b131235943e372f8df35fd43d1b"
+> miner.start(1)
+> miner.stop(2)
+> token.getBalance(web3.eth.accounts[0])
+70
+> token.getBalance(web3.eth.accounts[1])
+30
+
+#+END_SRC
+
+****** 其他
+
+私有链的所有数据都会放在仓库根目录下的 */tmp/eth/60/01* 目录中，删除这个目录可以清除所有数据，重新启动新环境。
+
+
+****** 在节点B上创建私链并且连接到A节点上
+
+
+#+BEGIN_SRC bash
+rm -rf /tmp/eth/60/02
+mkdir /tmp/eth/60/02
+geth --datadir="/tmp/eth/60/02" --genesis ./genesis.json --networkid "31415929" --ipcdisable --port 30302 --rpcport 8102 console
+
+# 然后创建帐号
+admin.nodeInfo
+personal.newAccount("129129")
+personal.listAccounts
+admin.nodeInfo
+
+miner.start(1) #记得要挖矿，如果不挖的话，建的这个帐号是没有钱的。
+
+miner.stop(1)
+
+# 接下来在B节点上增加A节点的信息，这里面一定要改为A节点的地址与端口号。这个enode可以在A上通过admin查看
+admin.addPeer("enode://fc74e3a60b5da1046828fa5a68c618c31f94ad29b3165c694ee0a8e3cab99390548ce463cfecbba62e0c9f71f3a906bce9f7f29ef90d9915f1273a30eacac515@10.1.1.50:30301"}
+
+# 接下来就能看到信息了。
+admin.peers
+#+END_SRC
+
+
+创建ABI，在A上复制过来。
+
+#+BEGIN_SRC cpp
+
+var cc = web3.eth.contract([{
+    constant: false,
+    inputs: [{
+        name: "x",
+        type: "uint256"
+    }],
+    name: "settk",
+    outputs: [],
+    type: "function"
+}, {
+    constant: true,
+    inputs: [],
+    name: "gettk",
+    outputs: [{
+        name: "",
+        type: "uint256"
+    }],
+    type: "function"
+}, {
+    constant: false,
+    inputs: [{
+        name: "account",
+        type: "address"
+    }, {
+        name: "amount",
+        type: "uint256"
+    }],
+    name: "issue",
+    outputs: [],
+    type: "function"
+}, {
+    constant: false,
+    inputs: [{
+        name: "to",
+        type: "address"
+    }, {
+        name: "amount",
+        type: "uint256"
+    }],
+    name: "transfer",
+    outputs: [],
+    type: "function"
+}, {
+    constant: true,
+    inputs: [{
+        name: "account",
+        type: "address"
+    }],
+    name: "getBalance",
+    outputs: [{
+        name: "",
+        type: "uint256"
+    }],
+    type: "function"
+}, {
+    inputs: [],
+    type: "constructor"
+}, {
+    anonymous: false,
+    inputs: [{
+        indexed: false,
+        name: "account",
+        type: "address"
+    }, {
+        indexed: false,
+        name: "amount",
+        type: "uint256"
+    }],
+    name: "Issue",
+    type: "event"
+}, {
+    anonymous: false,
+    inputs: [{
+        indexed: false,
+        name: "from",
+        type: "address"
+    }, {
+        indexed: false,
+        name: "to",
+        type: "address"
+    }, {
+        indexed: false,
+        name: "amount",
+        type: "uint256"
+    }],
+    name: "Transfer",
+    type: "event"
+}])
+
+
+#+END_SRC
+
+创建好abi对象之后，就可以用智能合约里面的东西了。
+#+BEGIN_SRC cpp
+// 看看有没有钱
+web3.eth.getBalance("0xb9fff215ea44ff1f0df7d745f21f32df8ca68be5")
+
+// 调用set方法
+cc.at('0x7f8dcf9fbbd0241325d5b32b847dac61e276e508').set_tk.sendTransaction(900, {from: web3.eth.accounts[0]});
+
+// 调用 get方法
+cc.at('0x7f8dcf9fbbd0241325d5b32b847dac61e276e508').get_tk()
+
+#+END_SRC
+
