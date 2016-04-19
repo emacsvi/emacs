@@ -6,6 +6,8 @@
 - [[file:bitcoin_sig_pubkey.org][数字签名证书]]
 - [[file:bitcoin_ethereum_notes.org][以太坊私链搭建以及简单的智能合约测试]]
 - [[file:bitcoin_ethereum_flipper_coin.org][以太坊投硬币]]
+- [[file:bitcoin_solidity_notes.org][solidity全文学习]]
+
 
 
 

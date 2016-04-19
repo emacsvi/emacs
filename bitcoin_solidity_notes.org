@@ -1,0 +1,13 @@
+#+title: solidity 学习
+
+
+To access a state variable, you do not need the prefix this. as is common in other languages.
+
+
+cryptocurrency 加密货币
+
+#+BEGIN_SRC js
+
+>loadScript('/path/to/myfile.js')
+
+#+END_SRC
