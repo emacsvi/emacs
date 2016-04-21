@@ -1,0 +1,88 @@
+#+title: luckyone
+
+**** 源码
+
+#+BEGIN_SRC js
+
+contract LuckyOne 
+{
+    address owner; 
+    uint testluckyone;
+    uint public numaddrs;
+    uint public numwiners;
+    event Log(address _from, address _to, string _func, string _msg, uint _value);
+    //event GetBalance(uint _value);
+    struct betinfo 
+    {
+        uint choice;
+        uint value; 
+    }
+    mapping(address => betinfo) public betinfos; 
+    mapping(uint => address) public addrs;
+    mapping(uint => address) public winers;
+    function LuckyOne() 
+    {
+        owner = msg.sender;
+    }
+    function kill()
+    {
+        if (msg.sender == owner)
+            suicide(owner);
+    }
+    function getBalance() returns (uint) 
+    {
+        Log(msg.sender, 0, "getBalance()", "0", this.balance);
+        return this.balance;
+    }
+    function adminWithdraw()
+    {
+        if (owner != msg.sender)
+            return;
+        msg.sender.send(this.balance);
+    }
+    function bet(uint choice) public
+    {
+        Log(msg.sender, 0, "bet()=>", "0", choice);
+        Log(msg.sender, 0, "bet()=>", "0", msg.value);
+        betinfos[msg.sender] = betinfo({choice: choice, value: msg.value});
+        addrs[numaddrs++] = msg.sender;
+    }
+    function setlucky(uint num) public
+    {
+        if (owner != msg.sender)
+            throw;
+        Log(msg.sender, 0, "before setlucky()=>", "0", testluckyone);
+        Log(msg.sender, 0, "after setlucky()=>", "0", num);
+        testluckyone = num;
+    }
+
+    function getvalue(address client_addr) returns (uint) 
+    {
+        Log(msg.sender, 0, "getvalue()=>", "0", betinfos[client_addr].value);
+        return betinfos[client_addr].value;
+    }
+    function getchoice(address client_addr) returns (uint) 
+    {
+        Log(msg.sender, 0, "getchoice()=>", "0", betinfos[client_addr].choice);
+        return betinfos[client_addr].choice;
+    }
+    function lucky() returns (uint) 
+    {
+        if (owner != msg.sender)
+            throw;
+        var r = 0;
+        for (var i = 0; i < numaddrs; i+=1)
+        {
+            if (betinfos[addrs[i]].choice == testluckyone)
+            {
+                winers[numwiners++] = addrs[i];
+                r += 1;
+                Log(msg.sender, 0, "lucky() winers:", "0", testluckyone);
+            }
+        }
+        return r;
+    }
+}
+
+
+#+END_SRC

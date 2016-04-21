@@ -678,4 +678,25 @@ I0419 18:08:19.799525    4747 worker.go:447] 🔨 🔗  Mined 5 blocks back: blo
 
 # 停止Watch方法
 event.stopWatching()
+
+
 #+END_SRC
+
+value:值如果不转化的话就是最小的单位Wei,不过你可以任意地进行转换格式。
+- ~web3.toWei(2000, "ether")~
+- ~web3.toWei(2000, "finney")~
+#+BEGIN_SRC js
+>mm.deposit(123, {from: web3.eth.accounts[0], value: 1200});
+
+
+bytes32 就是32字节的整形。
+toString(45)
+
+var hash = web3.sha3("Some string to be hashed");
+console.log(hash); // "0xed973b234cf2238052c9ac87072c71bcf33abc1bbd721018e0cca448ef79b379"
+
+var hashOfHash = web3.sha3(hash, {encoding: 'hex'});
+console.log(hashOfHash); // "0x85dd39c91a64167ba20732b228251e67caed1462d4bcf036af88dc6856d0fdcc"
+#+END_SRC
+
+

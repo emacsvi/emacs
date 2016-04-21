@@ -1,3 +1,4 @@
+
 #+title: 以太坊智能彩票系统问题汇总
 
 **** 一些待定的问题
@@ -10,132 +11,31 @@
 - 每一个用户下注的时候在智能合约里面就知道用户的Address地址，下了多少注，下注内容，这些信息都需要保存起来。如果用户量比较大的时候。这时候会不会有问题？
 
 
-**** 语法
+**** 上海交流会以太坊问题
 
-#+BEGIN_SRC js
 
-/// @title Voting with delegation.
-contract Ballot
-{
-    // This declares a new complex type which will
-    // be used for variables later.
-    // It will represent a single voter.
-    struct Voter
-    {
-        uint weight; // weight is accumulated by delegation
-        bool voted;  // if true, that person already voted
-        address delegate; // person delegated to
-        uint vote;   // index of the voted proposal
-    }
-    // This is a type for a single proposal.
-    struct Proposal
-    {
-        bytes32 name;   // short name (up to 32 bytes)
-        uint voteCount; // number of accumulated votes
-    }
-
-    address public chairperson;
-    // This declares a state variable that
-    // stores a `Voter` struct for each possible address.
-    mapping(address => Voter) public voters;
-    // A dynamically-sized array of `Proposal` structs.
-    Proposal[] public proposals;
-
-    /// Create a new ballot to choose one of `proposalNames`.
-    function Ballot(bytes32[] proposalNames)
-    {
-        chairperson = msg.sender;
-        voters[chairperson].weight = 1;
-        // For each of the provided proposal names,
-        // create a new proposal object and add it
-        // to the end of the array.
-        for (uint i = 0; i < proposalNames.length; i++)
-            // `Proposal({...})` creates a temporary
-            // Proposal object and `proposal.push(...)`
-            // appends it to the end of `proposals`.
-            proposals.push(Proposal({
-                name: proposalNames[i],
-                voteCount: 0
-            }));
-    }
-
-    // Give `voter` the right to vote on this ballot.
-    // May only be called by `chairperson`.
-    function giveRightToVote(address voter)
-    {
-        if (msg.sender != chairperson || voters[voter].voted)
-            // `throw` terminates and reverts all changes to
-            // the state and to Ether balances. It is often
-            // a good idea to use this if functions are
-            // called incorrectly. But watch out, this
-            // will also consume all provided gas.
-            throw;
-        voters[voter].weight = 1;
-    }
-
-    /// Delegate your vote to the voter `to`.
-    function delegate(address to)
-    {
-        // assigns reference
-        Voter sender = voters[msg.sender];
-        if (sender.voted)
-            throw;
-        // Forward the delegation as long as
-        // `to` also delegated.
-        while (voters[to].delegate != address(0) &&
-               voters[to].delegate != msg.sender)
-            to = voters[to].delegate;
-        // We found a loop in the delegation, not allowed.
-        if (to == msg.sender)
-            throw;
-        // Since `sender` is a reference, this
-        // modifies `voters[msg.sender].voted`
-        sender.voted = true;
-        sender.delegate = to;
-        Voter delegate = voters[to];
-        if (delegate.voted)
-            // If the delegate already voted,
-            // directly add to the number of votes
-            proposals[delegate.vote].voteCount += sender.weight;
-        else
-            // If the delegate did not vote yet,
-            // add to her weight.
-            delegate.weight += sender.weight;
-    }
-
-    /// Give your vote (including votes delegated to you)
-    /// to proposal `proposals[proposal].name`.
-    function vote(uint proposal)
-    {
-        Voter sender = voters[msg.sender];
-        if (sender.voted) throw;
-        sender.voted = true;
-        sender.vote = proposal;
-        // If `proposal` is out of the range of the array,
-        // this will throw automatically and revert all
-        // changes.
-        proposals[proposal].voteCount += sender.weight;
-    }
-
-    /// @dev Computes the winning proposal taking all
-    /// previous votes into account.
-    function winningProposal() constant
-            returns (uint winningProposal)
-    {
-        uint winningVoteCount = 0;
-        for (uint p = 0; p < proposals.length; p++)
-        {
-            if (proposals[p].voteCount > winningVoteCount)
-            {
-                winningVoteCount = proposals[p].voteCount;
-                winningProposal = p;
-            }
-        }
-    }
-}
-
-#+END_SRC
-
-****** Event事件
+| 知识点     | 具体内容                                                                                                                    |
+|------------+-----------------------------------------------------------------------------------------------------------------------------|
+| storage    | 智能合约里面保存数据的容量有没有限制                                                                                        |
+|            | storage的使用是如何收费的                                                                                                   |
+|            | 查询storage里面的信息是如何收费的，能不能有办法归避收费的问题                                                               |
+|            | 如果信息量过大的话，查询效率能不能保证                                                                                      |
+|            | 有没有接口能将storage里面的数据导出来。导出来会不会收费                                                                     |
+|------------+-----------------------------------------------------------------------------------------------------------------------------|
+| 合约相关   | 智能合约有没有一个timer定时器的功能，做到定时触发一个机制去做某件事情                                                       |
+|            | 合约到期到，如果不需要此合约了，如何清除此合约。所谓的清除是其他节点再来调用则不会成功                                      |
+|            | 合约清除的时候 *msg.sender.send(this.balance)* 和 *suicide(owner)* 有什么不一样，是都要调用吗？                             |
+|            | 作为一个普通用户，如果查看到智能合约相关的源代码。并且通过查看源代码的内容相信此合约没有作假行为                            |
+|            | 作为一个节点用户，除了通过合约地址与合约的ABI调用某个合约之外，还有没有其他方式调用合约的接口                               |
+|            | 当调用合约失败了，如何才能给用户一个比较友好的提示，让用户知道调用合约失败。失败原因提示给用户                              |
+|            | 调用合约除了geth钱包外，rpc外，还有没有其他办法，另外rpc调用是如何调用的。钱包geth调用除了console方式还有没有其他友好的方式 |
+|            | 写合约的语言有solidity,LLL,类python等，哪种是语言用得比较多，各个语言之间有什么差异                                         |
+|            | 开发智能合约有比较好用的IDE工具推荐吗，工作环境搭建上还不是很清楚                                                           |
+|------------+-----------------------------------------------------------------------------------------------------------------------------|
+| 以太坊问题 | 以太坊每一笔交易基本上都要收费，这笔费用是按什么计价来收取的                                                                |
+|            | 以太坊收费有没有其他方式来减少费用，比如打包交易等                                                                          |
+|            | 以太坊是底层是完全开源的吗                                                                                                  |
+|            | 以太坊上面跑的智能合约会越来越多，storage空间以后也会越来越大，这个问题以后会导致每一个节点同步很慢吗                       |
+|            | 轻客户端有没有限制，可以任意地获取某些block之后的吗                                                                         |
 
 
