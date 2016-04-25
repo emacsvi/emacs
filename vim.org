@@ -1,5 +1,9 @@
 #+title: vim
 
 - [[file:vim_shortkey.org][vim命令备忘]]
+- [[file:vim_cscope.org][cscope]]
+- [[file:vim_ctrlsf.org][ctrlsf]]
+- [[file:vim_jumpfromwindows.org][vim各窗口跳转]]
+- [[file:vim_yank.org][vim复制粘贴]]
 
 

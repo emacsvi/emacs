@@ -1,0 +1,74 @@
+#+title: ctrlsf查找
+
+Unix系统可以在命令行输入 ~cat ./*.js | grep app~ 用来查找某个单词，借助ack.vim也可以做到这点。不过今天我介绍一款国人写的搜索插件(ctrlsf)。
+
+**** 使用
+
+1. 通过命令: *CtrlSF {string}* 搜索单词，输入这个命令以后会出现一个窗口显示搜索结果
+2. 使用 *h j k l* 浏览窗口，通过 *<C-j>* 或者 *<C-k>* 定位搜索的单词
+3. 按回车打开文件
+4. 按 *p* 可以预览文件查看更多的信息
+5. 按 *q* 退出
+
+- 如果你意外关闭了搜索窗口，可以通过 *:CtrlSFOpen* 命令重新打开
+- 你可以像使用 *ack/ag* 一样传递 *-i* 或 *-C* 参数，也可以传文件路径
+- *:CtrlSFOpen* 和 *:CtrlSFClose* 打开和关闭搜索窗口
+- *CtrlSFUpdate* 更新搜索结果
+
+****** 在结果界面:
+| *p*   | p键预览                               |
+| 回车  | 回车进入闭关内关闭搜索结果框          |
+| *t*   | 键打开一个新的tag                     |
+| *O*   | 键进入代码窗口但不隐藏CtrlSF搜索界面  |
+| *c-o* | 以横向方式打开                        |
+| *T*   | 键打开一个新标签但还focus在搜索结果上 |
+| *q*   | q键退出                               | 
+
+****** 跳转：
+| c-j | c-j到下一个搜索结果 |
+| c-k | c-k到上一个搜索结果 |
+
+
+**** Examples
+
+  1. Search in a specific sub-directory
+
+#+BEGIN_SRC bash
+:CtrlSF {pattern} /path/to/dir
+#+END_SRC     
+
+  2. Search case-insensitively
+
+#+BEGIN_SRC bash
+    :CtrlSF -I {pattern}
+#+END_SRC
+
+
+  3. Search with regular expression
+#+BEGIN_SRC bash
+    :CtrlSF -R {regex}
+#+END_SRC
+
+  4. Show result with specific context setting
+#+BEGIN_SRC bash
+    :CtrlSF -A 3 -B 1 {pattern}
+#+END_SRC
+
+  5. Search in files with specific extension
+#+BEGIN_SRC bash
+    :CtrlSF -G .*\.cpp {pattern}
+#+END_SRC
+
+
+****  Maps by default in CtrlSF window:
+
+| <Enter>, <o> | Open file which contains the line under cursor.              |
+| <C-O>        | Open file in a horizontally split window.                    |
+| <p>          | Open a preview window to view file.                          |
+| <O>          | Like <o>, but always leave CtrlSF window open.               |
+| <T>          | Like <t>, but focus CtrlSF window instead of opened new tab. |
+| <q>          | Quit CtrlSF. Also close preview window if any.               |
+| <C-J>        | Move cursor to next match.                                   |
+| <C-K>        | Move cursor to previous match.                               |
+| <q>          | Quit preview mode.                                           |
+

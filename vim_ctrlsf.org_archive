@@ -1,0 +1,35 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /Users/liweilijie/repo/atom/pages/vim_ctrlsf.org
+
+
+* 使用
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2016-04-25 Mon 22:42
+  :ARCHIVE_FILE: ~/repo/atom/pages/vim_ctrlsf.org
+  :ARCHIVE_CATEGORY: vim_ctrlsf
+  :END:
+
+1. 通过命令: *CtrlSF {string}* 搜索单词，输入这个命令以后会出现一个窗口显示搜索结果
+2. 使用 *h j k l* 浏览窗口，通过 *<C-j>* 或者 *<C-k>* 定位搜索的单词
+3. 按回车打开文件
+4. 按 *p* 可以预览文件查看更多的信息
+5. 按 *q* 退出
+
+- 如果你意外关闭了搜索窗口，可以通过 *:CtrlSFOpen* 命令重新打开
+- 你可以像使用 *ack/ag* 一样传递 *-i* 或 *-C* 参数，也可以传文件路径
+- *:CtrlSFOpen* 和 *:CtrlSFClose* 打开和关闭搜索窗口
+
+在结果界面:
+| *p*   | p键预览                               |
+| 回车  | 回车进入闭关内关闭搜索结果框          |
+| *t*   | 键打开一个新的tag                     |
+| *O*   | 键进入代码窗口但不隐藏CtrlSF搜索界面  |
+| *c-o* | 以横向方式打开                        |
+| *T*   | 键打开一个新标签但还focus在搜索结果上 |
+| *q*   | q键退出                               | 
+
+跳转：
+| c-j | c-j到下一个搜索结果 |
+| c-k | c-k到上一个搜索结果 |
