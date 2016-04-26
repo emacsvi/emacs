@@ -1,0 +1,135 @@
+#+title: << go语言编程 >> 读书笔记
+
+**** 环境搭建
+安装很简单的。只需要记得设置好环境变量即可。推荐用源文件安装。里面有很多应用可以看看。
+
+
+
+**** 第一个Go程序
+
+#+BEGIN_SRC cpp
+package main
+
+import "fmt"
+
+func main() {
+    fmt.PrintLn("hello word.")
+}
+#+END_SRC
+
+
+- 每个go源代码文件的开头都是一个package声明，表示该go代码所属的包。
+- 包是go里面最基本的分发单位。
+- 要生成一个go可执行程序，必须建立一个名字为main的包，并且在该包中包含一个叫 *main()* 的函数。
+
+编译并且运行的方法：
+#+BEGIN_SRC bash
+
+cd test
+go run hello.go #直接运行
+
+
+cd test
+go build hello.go
+./hello
+
+#+END_SRC
+
+真正go的编译和链接器被go命令行工具隐藏在后面，我们可以直接使用它们。
+#+BEGIN_SRC bash
+
+6g hello.go
+6l hello.6
+./6.out
+
+# 6g和6l是64位版本的编译器和链接器
+# 8g和8l是32位的。
+
+#+END_SRC
+
+
+对于创建工程文件，我写了一个python脚本来做 *gonew.py*
+
+#+BEGIN_SRC py
+
+#!/usr/bin/env python
+# -*- encoding:utf-8 -*-
+'''
+    just to create golang project tree
+
+    command: gonew <project_name>
+
+    it will be create the tree:
+
+    <src>
+'''
+
+import os
+import sys
+
+print('script_name: %s' % (sys.argv[0]))
+
+for i in range(1, len(sys.argv)):
+    print('argv: %d=>%s' % (i, sys.argv[i]))
+
+if len(sys.argv) < 2:
+    print('error argument: command: gonew <project_name>')
+    exit(1)
+
+print('ok')
+if False == os.path.exists(sys.argv[1]):
+    os.mkdir(sys.argv[1])
+
+os.chdir(sys.argv[1])
+
+if False == os.path.exists("src"):
+    os.mkdir("src")
+
+if False == os.path.exists("src/%s" % sys.argv[1]):
+    os.mkdir("src/%s" % sys.argv[1])
+
+if False == os.path.exists("src/comm"):
+    os.mkdir("src/comm")
+
+if False == os.path.exists("bin"):
+    os.mkdir("bin")
+
+if False == os.path.exists("pkg"):
+    os.mkdir("pkg")
+
+os.chdir("src")
+os.chdir(sys.argv[1])
+
+if False == os.path.exists("%s.go" % (sys.argv[1])):
+    print("%s.go" % (sys.argv[1]))
+    os.system("touch %s.go" % (sys.argv[1]))
+
+print('success')
+
+
+#+END_SRC
+
+
+创建好的文件结构如下：
+
+#+BEGIN_SRC bash
+
+➜  go_test ./gonew.py hello
+script_name: ./gonew.py
+argv: 1=>hello
+ok
+hello.go
+success
+➜  go_test tree hello
+hello
+├── bin
+├── pkg
+└── src
+    ├── comm
+    └── hello
+        └── hello.go
+
+5 directories, 1 file
+➜  go_test
+
+#+END_SRC

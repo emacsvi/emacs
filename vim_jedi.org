@@ -1,0 +1,24 @@
+#+title: jedi
+
+**** jedi插件概念
+此插件是python里面一个自动补全与跳转插件。
+
+我几乎不用自动补全的。跳转也是用的tags,cscope来做的。但是python有很多局限性。没有办法只能用这个工具。
+
+安装的时候记得：
+
+#+BEGIN_SRC py
+
+pip install jedi
+
+#+END_SRC
+
+**** 快捷键
+
+| Default: <leader>d | Go to definition (or assignment) |
+| Default: <leader>g | Go to assignment                 |
+| Default: <K>       | Show pydoc documentation         |
+| Default: <leader>n | Show usages of a name.           | 
+
+  
+- <leader>n The quickfix window is populated with a list of all names which point to the definition of the name under the cursor.

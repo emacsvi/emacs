@@ -1,0 +1,9 @@
+#+title: Golang
+
+听说golang比较强大，我也来试试。
+
+虽然我很喜欢python，但是golang天生高并发的处理能力实在让人喜欢。
+
+还有以太坊的代码主要还是golang来写的。这足以证明golang有学习的价值。
+
+- [[file:go_notes.org][go读书笔记]]

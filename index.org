@@ -8,6 +8,7 @@ main index:
 - [[file:emacs.org][Emacs]]
 - [[file:mac.org][mac]]
 - [[file:python.org][Python]]
+- [[file:go.org][Golang]]
 - [[file:mylife.org][生活]]
 - [[file:aboutme.org][About Me]]
 
