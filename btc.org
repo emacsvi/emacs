@@ -8,6 +8,7 @@
 - [[file:bitcoin_ethereum_flipper_coin.org][以太坊投硬币]]
 - [[file:bitcoin_solidity_notes.org][solidity全文学习]]
 - [[file:bitcoin_ethereum_struct.org][solidity结构体]]
+- [[file:bitcoin_ethereum_simple_contract.org][以太坊简单合约示例]]
 
 
 

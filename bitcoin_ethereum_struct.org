@@ -2,7 +2,9 @@
 
 **** 结构体使用
 
-*Structs* Solidity provides a way to define new types in the form of structs, which is shown in the following example:
+*Structs* 
+
+Solidity provides a way to define new types in the form of structs, which is shown in the following example:
 
 #+BEGIN_SRC js
 
