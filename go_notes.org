@@ -1,5 +1,23 @@
 #+title: << go语言编程 >> 读书笔记
 
+
+
+**** 相关链接
+
+- [[http://www.oschina.net/translate/go-at-google-language-design-in-the-service-of-software-engineering][Go 在谷歌：以软件工程为目的的语言设计]]
+- [[https://code.google.com/p/go-wiki/wiki/Projects][go-wiki]]
+- [[http://gowalker.org/][Go Walker]]
+- [[http://go-lang.cat-v.org/library-bindings][Go Language Resources]]
+- [[https://docs.google.com/spreadsheet/lv?key=0AqIvOG5Y0CJ6dFFJV0JwSm1kbEtEdmg5Nk1uZndzakE][Golang 相关 QQ 群]]
+- Go 源码安装：[[https://github.com/astaxie/build-web-application-with-golang/blob/master/ebook/01.1.md][参考链接]]
+- Go 标准包安装：[[http://www.golangtc.com/download][下载地址]]
+- [[https://github.com/astaxie/godoc][CHM手册]]
+- 其它 IDE 安装方案：[[https://github.com/astaxie/build-web-application-with-golang/blob/master/ebook/01.4.md][参考链接]]
+- 下载 Sublime Text：[[http://www.sublimetext.com/][官方网站]]
+- 安装 gosublime（破解版可能无法安装）：[[http://my.oschina.net/Obahua/blog/110767][安装指令]]
+- [[http://lucifr.com/2011/08/31/sublime-text-2-tricks-and-tips/][Sublime Text 2 入门及技巧]]
+- [[http://bbs.studygolang.com/thread-67-1-1.html][Go 初学者常问的问题 FAQ]]
+
 **** 环境搭建
 安装很简单的。只需要记得设置好环境变量即可。推荐用源文件安装。里面有很多应用可以看看。
 
@@ -132,4 +150,182 @@ hello
 5 directories, 1 file
 ➜  go_test
 
+#+END_SRC
+
+
+看书的一些例子：
+#+BEGIN_SRC cpp
+
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("hello world!")
+
+	fmt.Println("====================")
+	str := "Hello, 世界"
+	n := len(str)
+	for i := 0; i < n; i++ {
+		ch := str[i]
+		fmt.Println(i, ch)
+	}
+	fmt.Println("====================")
+	for i, ch := range str {
+		fmt.Println(i, ch)
+	}
+	fmt.Println("====================")
+
+	fmt.Println("============<切片>===========")
+	/*
+		[32]byte
+		[2*N] struct {x, y int32}
+		[1000]*float64
+		[3][5]int
+		[2][2][2]float64
+	*/
+
+	array := [5]int{1, 2, 3, 4, 5}
+
+	// 这里为了示范值类型，所有的值类型传递都是拷贝的方式。
+	modify(array)
+
+	fmt.Println("In main(), array values:", array)
+	fmt.Println("====================")
+
+	// 定义10个元素的数组
+	var myArray [10]int = [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	// mySlice = myArray[:] 整个数组来定义切片
+	// mySlice = myArray[5:] 从第5个元素开始的所有元素创建数组切片
+	// 从数据前5个元素来定义切片
+	var mySlice []int = myArray[:5]
+	fmt.Println("Elements of myArray: ")
+	for _, v := range myArray {
+		fmt.Print(v, " ")
+	}
+	fmt.Println("\nElemnets of mySlice: ")
+	for _, v := range mySlice {
+		fmt.Print(v, " ")
+	}
+
+	fmt.Println()
+
+	/*
+		数组切片的数据结构可以抽象为以下3个变量：
+		- 一个指向原生数组的指针
+		- 数组切片中的元素个数
+		- 数组切片已分配的存储空间
+	*/
+
+	// 创建一个初始元素个数为5的数组切片，元素初始值为0
+	mySlice1 := make([]int, 5)
+	for _, v := range mySlice1 {
+		fmt.Print(v, " ")
+	}
+	fmt.Println()
+	fmt.Println("====================")
+	// 创建一个初始元素为5的数组切片，元素初始值为0，并预留10个元素的存储空间
+	mySlice2 := make([]int, 5, 10)
+	for _, v := range mySlice2 {
+		fmt.Print(v, " ")
+	}
+	fmt.Println()
+	fmt.Println("====================")
+	// 直接创建并初始化包含5个元素的数组切片：
+	mySlice3 := []int{1, 2, 3, 4, 5}
+	for _, v := range mySlice3 {
+		fmt.Print(v, " ")
+	}
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Println("============<map>===========")
+	// map的一些例子
+	type PersonInfo struct {
+		ID      string
+		Name    string
+		Address string
+	}
+
+	var personDB map[string]PersonInfo
+	// func make(Type, size IntegerType) Type
+	// personDB = make(map[string]PersonInfo, 100) 可以分配100个存储能力
+	// personDB = map[string]PersonInfo {
+	//     "1234": PersonInfo{"1", "Jack", "Room 101,..."}
+	// }
+	personDB = make(map[string]PersonInfo)
+
+	// 往这个map里面插入几条数据
+	personDB["12345"] = PersonInfo{"12345", "Tom", "Room 203,..."}
+	personDB["1"] = PersonInfo{"1", "Jack", "Room 101,...."}
+
+	// 从这个map查找键为 "1234" 的信息
+	person, ok := personDB["1234"]
+
+	// ok是一个返回为bool型，返回true表示找到了对应的数据
+	if ok {
+		fmt.Println("Found person", person.Name, "with ID 1234.")
+	} else {
+		fmt.Println("Did not find person with ID 1234.")
+	}
+
+}
+
+func modify(array [5]int) {
+	array[0] = 10
+	fmt.Println("In modify(), array values:", array)
+}
+
+
+#+END_SRC
+
+
+- [[https://code.google.com/p/go-wiki/w/list][go项目]]
+go是2009年出来的，比较新的一门语言。
+
+
+从严格意义上讲 type newInt int, 这里 newInt 并不能说是 int 的别名，而只是底层数据结构相同，在这里称为自定义类型，在进行类型转换时仍旧需要显式转换，但 byte 和 rune 确确实实为 uint8 和 int32 的别名，可以相互进行转换。有关于自定义类型将在后面的教程中进行讲解。 
+
+
+#+BEGIN_SRC cpp
+
+a := 1
+var p *int = &a
+fmt.Println(*p)
+#+END_SRC
+
+数组可以用==和!=来进行比较。不能用><等。
+
+
+#+BEGIN_SRC cpp
+
+// p是指针。
+p := new([10]int)
+p[1] = 2
+
+    
+a := [2][3]int{
+ {1,1,1},
+ {2,2,2}}
+
+// 数组的定义方式还有：
+
+ a := [20]int{19:1}
+
+a := [...]int{1,2,3,5}
+
+a := [...]int{0:1, 1:2, 2:3}
+
+
+a := [...]int{99:1}
+var p *[100]int = &a
+
+
+x,y := 1,2
+a := [...]*int{&x, &y}
+
+
+a := [10]int{}
+s1 := a[5:10]
 #+END_SRC

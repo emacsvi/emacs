@@ -1,3 +1,4 @@
 #+title: 生活
 
 - [[file:zhaopin.org][招聘相关]]
+- [[file:jimny_seda.org][色达]]
