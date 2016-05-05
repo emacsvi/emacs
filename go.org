@@ -6,6 +6,9 @@
 
 还有以太坊的代码主要还是golang来写的。这足以证明golang有学习的价值。
 
-- [[file:go_notes.org][go读书笔记]]
 - [[file:pkgdoc/index.html][godoc]]
+- [[file:go_notes.org][go读书笔记]]
+- [[file:go_interface.org][interface]]
+- [[file:go_fmt.org][fmt]]
+- [[file:go_strings.org][strings函数和方法]]
 

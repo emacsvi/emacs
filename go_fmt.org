@@ -1,0 +1,8 @@
+#+title: fmt
+
+**** 参考
+
+- [[https://github.com/polaris1119/The-Golang-Standard-Library-by-Example/blob/master/chapter01/01.3.md][fmt手册]]
+- [[http://www.cnblogs.com/golove/p/3284304.html][格式化转出的方法]]
+- [[http://www.cnblogs.com/golove/p/3286303.html][fmt包中的函数与方法]]
+
