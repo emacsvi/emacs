@@ -11,4 +11,6 @@
 - [[file:go_interface.org][interface]]
 - [[file:go_fmt.org][fmt]]
 - [[file:go_strings.org][strings函数和方法]]
+- [[file:go_object_instance.org][go对象初始化]]
+- [[file:go_otto.org][otto]]
 

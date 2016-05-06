@@ -1,0 +1,23 @@
+#+title: 以太坊需要研究的
+
+**** block相关的
+
+如果一个block上有许多的交易，如何才能知道是与我的合约相关示例代码.
+
+- [[https://github.com/ethereum/go-ethereum/issues/2104][getblock(i, true)]]
+
+#+BEGIN_SRC js
+
+// It isn't easy and will be time consuming.
+
+var n = eth.blocknumber;
+var txs = [];
+for(var i = 0; i < n; i++) {
+    var block = eth.getBlock(i, true); // 得到一个block里面所有的信息，包括所有的交易信息
+    for(var j = 0; j < block.transactions; j++) { //遍列所有的交易。查看to地址是不是自己合约的地址就可以。
+        if( block.transactions[j].to == the_address )
+            txs.push(block.transactions[j]);  // 放到数组里面
+    }
+}
+
+#+END_SRC

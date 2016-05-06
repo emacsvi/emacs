@@ -1,0 +1,26 @@
+#+title: mac安装mongodb
+
+- [[http://yijiebuyi.com/blog/b6a3f4a726b9c0454e28156dcc96c342.html][mongodb安装]]
+
+#+BEGIN_SRC bash
+
+
+ 6410  sudo brew install mongodb
+ 6416  sudo mkdir -p /data/db
+ 6418  sudo chmod -R 777 /data/db
+ 6419  ls /usr/local/Cellar/mongodb/3.2.5/bin
+ 6420  vim ~/.bashrc
+ 6421  source ~/.bashrc
+
+export PATH=$PATH:/usr/local/Cellar/mongodb/3.2.5
+
+
+ 6433  sudo vim /usr/local/etc/mongod.conf
+
+
+
+
+ 6439  mongod
+ 6440  mongo
+
+#+END_SRC

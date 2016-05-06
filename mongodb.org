@@ -1,0 +1,3 @@
+#+title: mongodb
+
+- [[file:mongodb_install_mac.org][mac安装mongodb]]

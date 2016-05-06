@@ -1,0 +1,91 @@
+#+title: 对象初始化
+
+**** 简单示例
+
+比如有这样一个对象：
+
+#+BEGIN_SRC cpp
+type ProductConfig struct { 
+    Site map[string]string 
+}
+#+END_SRC
+
+对应的初始化可以如下写：
+
+
+#+BEGIN_SRC cpp
+
+var pc ProductConfig 
+pc = ProductConfig{Site: map[string]string{"rakuten": "http://item.rakuten.co.jp/auc-trustgift/10079213/", 
+    "tmail": "http://detail.tmall.hk/hk/item.htm?spm=a230r.1.14.10.tCoYIo&id=41304819572&ad_id=&am_id=&cm_id=140105335569ed55e27b&pm_id=&abbucket=6"}}
+#+END_SRC
+
+需要注意的几点：
+- 其中的成员变量幅值不用 "" 括起来。
+- 内部变量类型，需要指明，类似这里的 *map[string]string* 。
+
+
+**** 复杂一点示例
+
+继续复杂点的：
+
+*对象* ：
+
+
+#+BEGIN_SRC cpp
+
+type tomlConfig struct { 
+    CrawlerSource map[string]ProductConfig 
+}
+
+type ProductConfig struct { 
+    Site map[string]string 
+}
+#+END_SRC
+
+初始化赋值代码如下：
+
+#+BEGIN_SRC cpp
+
+toml := tomlConfig{CrawlerSource: map[string]ProductConfig{ 
+    "1": ProductConfig{Site: map[string]string{"rakuten": "http://item.rakuten.co.jp/auc-trustgift/10079213/", 
+        "tmail": "http://detail.tmall.hk/hk/item.htm?spm=a230r.1.14.10.tCoYIo&id=41304819572&ad_id=&am_id=&cm_id=140105335569ed55e27b&pm_id=&abbucket=6"}}, 
+    "2": ProductConfig{Site: map[string]string{"rakuten": "http://item.rakuten.co.j", 
+        "tmail": "http://detail.tmall.hk/hk/item.htm?spm=a2"}}, 
+}}
+
+#+END_SRC
+
+
+
+**** 再复杂一点的对象：
+
+
+#+BEGIN_SRC cpp
+type tomlConfig struct { 
+    CrawlerSource map[string]ProductConfig 
+}
+
+type ProductConfig struct { 
+    Name string 
+    Site map[string]string 
+}
+
+#+END_SRC
+
+对应的初始化
+
+
+#+BEGIN_SRC cpp
+toml := tomlConfig{CrawlerSource: map[string]ProductConfig{ 
+    "1": ProductConfig{ 
+        Name: "测试1", 
+        Site: map[string]string{"rakuten": "http://item.rakuten.co.jp/auc-trustgift/10079213/", 
+            "tmail": "http://detail.tmall.hk/hk/item.htm?spm=a230r.1.14.10.tCoYIo&id=41304819572&ad_id=&am_id=&cm_id=140105335569ed55e27b&pm_id=&abbucket=6"}}, 
+    "2": ProductConfig{ 
+        Name: "liwei", 
+        Site: map[string]string{"rakuten": "http://item.rakuten.co.j", 
+            "tmail": "http://detail.tmall.hk/hk/item.htm?spm=a2"}}, 
+}}
+
+#+END_SRC

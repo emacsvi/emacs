@@ -9,6 +9,7 @@ main index:
 - [[file:mac.org][mac]]
 - [[file:python.org][Python]]
 - [[file:go.org][Golang]]
+- [[file:mongodb.org][mongodb]]
 - [[file:mylife.org][生活]]
 - [[file:aboutme.org][About Me]]
 
