@@ -1,0 +1,190 @@
+#+title: 学习mongodb混乱笔记
+
+**** bson扩充的数据类型
+此为json的一种扩展，主要用于数据库上的一种数据类型。
+会将json文件转为二进制码放到数据库里面。
+
+**** 一些名称
+- mongodb没有主键一说。
+- 表-集合list
+- 表的一行数据-文档document
+- mdb查询使用内置find函数-》基于bson的特出查询工具
+- 只有有了集合数据库才会真正被创建
+- use [databaseName]
+- db.persons.insert({name: "emacsvi"})
+- show dbs
+- db.[documentName].insert({...})
+- show collections 查看数据库中所有文档
+- system.indexes 自动存索引的文档
+- db.system.indexes.find().pretty()
+- db.persons.findOne() 查看第一条数据
+- 更新器用来更新文档
+  + db.persons.update({name:"emacsvi"}, {$set:{name:"jimny"}})
+
+
+var p = db.persons.findOne();
+db.person.update(p, {name:"jimny"})
+
+mdb的shell就是一个js解释器引擎。可以像node.js一样那样使用。
+
+删除文档中数据
+- db.[documentName].remove({...})
+mongodb默认只改第一条数据
+db.person.remove({age:2})
+
+查询器  修改器。
+删除数据库中的集合：
+- db.persons.drop() 删除集合
+- show collections
+
+删除数据库：
+- db.dropDatabase()
+- show dbs
+
+shell中的help
+- user foobar
+- db.persoin.insert({name:"emacsvi"})
+- db.help() 数据库级别的help
+- db.getName()
+- db.status()
+
+- db.persons.help() 集合的help
+- db.persons.count()
+
+mdbapi: http://api.mongodb.org/js/2.1.2/symbols/
+
+
+数据库和集合的命名全部都是小写
+数据库里面可以直接执行js的代码：
+
+functoin insert(object) {
+   db.getCollection("persons").text.insert(object)
+}
+
+inert({name:"hello"})
+
+
+- db.eval("return 'mongodb'") 在db里面执行js
+
+bson扩展的数据类型：
+- null表示空或者不存在的字段
+- true false
+- js块代码
+- 正则
+- undefined
+- 内嵌文档
+
+- db.persons.insert({_id: "001", name: "123"})
+批量的插入：
+
+
+save 与insert不同的是当id相同时，Save可以成功,它会更新相同id那个字段，而insert则会报错
+
+db.persons.remove()删除了集合但是索引并不会删除。可以在system.indexes里面查看
+
+根据条件来删除：
+db.persons.remove({_id:1})
+
+
+强硬的文档替换式更新操作：
+- db.[documentName].update({查询器},{修改器}) 会删除文档所有数据。
+- Insert or update操作 查询器查到了就成了更新操作，如果找不到就成了insert操作。也就是在最后加一个true *db.persons.update({_id:4}, {_id:4, name:4}, true)*
+
+- db.persons.update({name:3}, {name:"dada"}) 如果有多条，只会更新第一条数据
+- db.persons.update({name:3}, {$set{name:"dada"}}, false,true) 如果有多条，第三个参数是false表示如果没有找到不insert，第四个参数是true表示批量更新。另外批量更新必须要与修改器一起使用。也就更$set这种
+
+修改器相关的：
+- $set 找到这个键则进行update，如果没有找到则会进行insert
+- $inc 只有是用的数字类型，它会为数据类型自动增加或者减少指定数， db.person.update({age:27}, {$inc:{age:-1}}) 会将27-1变为26，如果为正数就量28了
+- $unset 删除数据集合中指定的键。db.persons.update({age:27}, {$unset:{age:1}})
+- $push比较复杂
+  + 如果指定的键是数组，则增加
+  + 如果不是数组就报错
+  + 如果没有数组，则创建数据类型的值对键 
+  + db.person.insert{_id:5, name:5, books:[]}
+  + db.person.update({_id:5}, {$push:{books:"js"}})
+
+- $pushAll 增加数组 db.persons.update({_id:5}, {$pushAll:{books:["02", "03", "04"]}})
+- $addToSet: 如果数据存在则不增加，如果不存在则增加 db.person.update({_id:5}, {$addToSet:{books:"js"}})
+- $pop 1为删除第一个值 -1删除最后一个值  db.person.update({_id:5}, {$pop:{books:-1}})
+- $pull 删除一个被指定的值 db.person.update({_id:5}, {$pull:{books:"js"}})
+- $pullAll 同上，不过是批量删除
+- $ 数据定位器，定位数组用的，所有以点来索引的一定要加上双引号，db.persons.update({"books.type":"JS"}, {$set:{"books.$.count":152}}) 查看有没有count的，如果没有则进行insert进去
+切记修改器是一定要放到最外面的，而查询器是放到内层的。
+
+
+
+- $addToSet与$each结合完成批量数组的更新,不能利用pullAll增加，它不会判断是否存在 
+- db.persons.remove({_id:6})
+- db.person.update({_id:})
+- db.person.update({_id:5}, {$addToSet:{books:{$each:["js", "DB"]}}}) 如果原本用js的话就不会增加进去了。它会自动判断的。而pullAll会全部增加进行。
+
+
+
+更新一些东西，并且返回更新了哪些
+findAndModify:"persons"
+db.runCommand
+
+
+
+**** find详讲
+
+***** 指定返回的键
+- db.pp.find()
+- db.pp.find({}, {_id:0, name:1, country:1}) 默认会返回id,所以这里要将id设置为0
+- db.[doucumentName].find({条件}, {键值定})  
+
+比较操作符：
+| $lt  | <  |
+| $lte | <= |
+| $gt  | >  |
+| $gte | >= |
+| $ne  | != | 
+
+查询出在25岁到27岁之间的学生:
+- db.pp.find({age:{$gte:25, $lte:27}}, {_id:0, name:1, age:1})  
+用或者关系是写到一个对象里面
+
+查询不是korea的学生
+- db.pp.find({country:{$ne:"Korea"}}, {_id:0, m:1})
+
+包含或者不包含 $in 或者 $nin 只能作用于数组，不能用其他对象
+查询中国或者美国的
+db.pp.find({country:{$in:["USA", "China"]}}， {_id:0, name:1})
+
+
+$or 查询
+查询语言成绩大于 85或者 英语大于 90的学生
+- db.pp.find({$or:[{c:{$gt:85}}, {e:{$gt:90}}]}{_id:0, name:1})
+
+
+Null
+把中国的学生上增加新的键sex
+db.pp.update({country:"China"}, {$set:{sex:"m"}}, false, true)
+
+db.pp.find({sex:{$in:[null]}}, {_id:0, name:1, sex:1})
+
+
+
+正则查询：
+查询名字里面有"li"的学生
+db.pp.find({name:/li/i}, {_id:0, name:1, sex:1})
+
+$not的使用：
+$not可以用到任何地方进行取反操作：
+而in只用于集合上
+db.pp.find({name:{$not:/li/i}}, {_id:0, name:1, sex:1})
+
+数组查询$all和数组索引查询
+
+
+
+
+
+
+
+
+
+
+
+

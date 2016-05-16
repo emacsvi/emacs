@@ -1,0 +1,58 @@
+#+title: mgo常用的语句
+
+
+**** 只查询数据库的某个字段Select
+
+利用 *Select* 
+
+#+BEGIN_SRC cpp
+err := usersC.Find(bson.M{"_id": bson.M{"$in": []bson.ObjectId{bson.ObjectIdHex("5698e96492775ae481c27032")}}}).Select(bson.M{"devices": 1}).All(&result)
+if err != nil {
+        fmt.Println(err)
+}
+
+
+db.coll.find({}, {categories:{ $elemMatch: {"slug":"general"}}})
+
+
+err := collection.Find(nil).Select(bson.M{"categories": bson.M{"$elemMatch": bson.M{"slug": "general"}}}).One(&result)
+
+
+selectedFields := bson.M{fieldA: 1, fieldB: 1}
+result = c.Find(query).Select(selectedFields).One()
+
+#+END_SRC
+
+平时基本上用这种就可以：
+#+BEGIN_SRC cpp
+
+var result []struct{ Text string `bson:"text"` }
+err := c.Find(nil).Select(bson.M{"text": 1}).All(&result)
+if err != nil {
+    // handle error
+}
+for _, v := range result {
+     fmt.Println(v.Text)
+}
+
+#+END_SRC
+
+去掉无用的_id显示：
+#+BEGIN_SRC cpp
+
+err = d.Find(bson.M{}).Select(bson.M{"log": 1, "_id": 0}).All(&result1)
+
+#+END_SRC
+
+- 查询字段，即需要某些字段 *Select(bson.M{“field1”:1,”field2”:1}*
+- 排除字段，即不需要某些字段 *Select(bson.M{“field1”:0,”field2”:0}*
+
+
+**** Update
+
+#+BEGIN_SRC cpp
+collection.Update(bson.M{"_id": id}, bson.M{"$set": bson.M{"name": "new Name"}}
+
+#+END_SRC
+
+

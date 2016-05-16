@@ -1,3 +1,4 @@
 #+title: mongodb
 
 - [[file:mongodb_install_mac.org][mac安装mongodb]]
+- [[file:mongodb_notes.org][mongodb笔记]]

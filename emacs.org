@@ -2,5 +2,6 @@
 
 - [[file:spacemacs.org][spacemacs相关]]
 - [[file:emacs_orgmode_syntax.org][orgmode代码着色]]
+- [[file:emacs_ditaa.org][ditaa]]
 
 

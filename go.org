@@ -13,4 +13,5 @@
 - [[file:go_strings.org][strings函数和方法]]
 - [[file:go_object_instance.org][go对象初始化]]
 - [[file:go_otto.org][otto]]
+- [[file:go_mgostatement.org][mgo常用语句]]
 
