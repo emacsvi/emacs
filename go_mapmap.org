@@ -1,0 +1,5 @@
+#+title: golang多维map的使用
+
+- [[http://tnt.wicast.tk/2015/11/02/golang-multiple-dimension-map/][多维map]]
+
+
