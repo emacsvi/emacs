@@ -1,0 +1,207 @@
+#+title: go语言重写更新blog用的脚本
+
+**** 功能介绍
+更新blog之前用 ~shell~ 写过
+
+后来用 ~python~ 重写过。
+
+今天又用 ~go~ 来写。主要是将代码提交到github上。然后再将html里面的一些标签修改下。再提交www下的html文件。
+
+**** 源码
+#+BEGIN_SRC go
+
+package main
+
+import (
+	"log"
+	"os"
+	"os/exec"
+	"io/ioutil"
+	"bytes"
+	"time"
+	"fmt"
+	"strings"
+	"regexp"
+)
+
+func SysCmd(s string) error {
+
+	log.Println("sysCmd exect:", s)
+
+	Cmd := exec.Command("/usr/bin/sh", "-c", s)
+
+	var out bytes.Buffer
+	Cmd.Stdout = &out
+	err := Cmd.Run()
+	if err != nil {
+		log.Printf("exec [%s]\n%+v\n", s, out.String())
+		if strings.Contains(out.String(), "nothing to commit") {
+			log.Println("not thing to do..")
+			return nil
+		}
+
+		log.Fatalln(err)
+		return err
+	}
+
+	log.Printf("exec [%s]\n%+v\n", s, out.String())
+
+	return nil
+}
+
+// 提交org文件到github上
+func PushOrg() {
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalln("Err getwd()", err)
+	}
+	log.Println("pwd:", pwd)
+
+	err = os.Chdir("/Users/liweilijie/repo/atom/pages")
+	if err != nil {
+		log.Println("Error Chidr()", err)
+	}
+
+	pwd, err = os.Getwd()
+	if err != nil {
+		log.Fatalln("Err getwd()", err)
+	}
+	log.Println("pwd:", pwd)
+
+	SysCmd("git add .")
+	SysCmd(fmt.Sprintf("git commit -a -m \"%v by golang program auto-complete\"", time.Now()))
+	SysCmd("git push origin master")
+}
+
+func PushWWW() {
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalln("Err getwd()", err)
+	}
+	log.Println("pwd:", pwd)
+
+	err = os.Chdir("/Users/liweilijie/repo/atom/www")
+	if err != nil {
+		log.Println("Error Chidr()", err)
+	}
+
+	pwd, err = os.Getwd()
+	if err != nil {
+		log.Fatalln("Err getwd()", err)
+	}
+	log.Println("pwd:", pwd)
+
+	SysCmd("git add .")
+	SysCmd(fmt.Sprintf("git commit -a -m \"%v by golang program auto-complete\"", time.Now()))
+	SysCmd("git push origin master")
+}
+
+func ProcessHtml() {
+
+	// 1. 读取所有的www目录下的文件
+	err := os.Chdir("/Users/liweilijie/repo/atom/www")
+	if err != nil {
+		log.Fatalln("Err getwd()", err)
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalln("Err getwd()", err)
+	}
+	log.Println("pwd:", pwd)
+
+	file, err := os.Open("/Users/liweilijie/repo/atom/www")
+	if err != nil {
+		log.Println("Err Open", err)
+	}
+
+	filename, err := file.Readdirnames(-1)
+	if err != nil {
+		log.Println("Err Readdirnames()", err)
+	}
+
+	reg1 := regexp.MustCompile(`<pre\sclass="src\ssrc-(\w+)">(.*)`)
+	reg2 := regexp.MustCompile(`[^</code>]</pre>(.*)`)
+	rep1 := []byte(`<pre><code class="language-${1}">${2}`)
+	rep2 := []byte(`</code></pre>${1}`)
+
+        // 正则匹配html里面的pre标签，加上对应的language的class
+	for _, f := range filename {
+		if strings.HasSuffix(f, "html") {
+			//log.Println("hasSuffix() true...")
+
+			name := pwd + "/" + f
+			content, err := ioutil.ReadFile(name)
+			if err != nil {
+				log.Println("Error ioutils.ReadFile(", name, ")", err)
+			}
+			//log.Printf("%s\n", content)
+
+
+			t1 := reg1.ReplaceAll(content, rep1)
+			t2 := reg2.ReplaceAll(t1, rep2)
+
+			err = ioutil.WriteFile(name, t2, os.ModeAppend)
+			if err != nil{
+				log.Println("Err", err)
+				break
+			}
+
+			//log.Println("..............................................................................")
+			//log.Printf("%s\n", t2)
+
+		} else {
+			log.Println("hasSuffix() false and nothing to do...")
+		}
+	}
+}
+
+func main() {
+	log.SetFlags(log.Lshortfile)
+
+	PushOrg()
+
+	ProcessHtml()
+
+	PushWWW()
+
+	return
+}
+
+
+/*
+	b := []byte(`<pre class="src src-python">@requires_authorization
+			def somefunc(param1='', param2=0):
+			r'''A docstring'''
+			if param1 &gt; param2: # interesting
+			print 'Gre\'ater'
+			return (param2 - param1 + 1 + 0b10l) or None
+
+			class SomeClass:
+			pass
+
+			&gt;&gt;&gt; message = '''interpreter
+			... prompt'''
+			... prompt'''
+			dada</pre>
+			tttt</code></pre>`)
+
+	log.Printf("%s\n", b)
+
+	reg1 := regexp.MustCompile(`<pre\sclass="src\ssrc-(\w+)">(.*)`)
+	reg2 := regexp.MustCompile(`[^</code>]</pre>(.*)`)
+	rep1 := []byte(`<pre><code class="language-${1}">${2}`)
+	rep2 := []byte(`</code></pre>${1}`)
+
+	t1 := reg1.ReplaceAll(b, rep1)
+	log.Printf("%q\n", t1)
+	log.Printf("%s\n", t1)
+	log.Println("..................")
+
+	t2 := reg2.ReplaceAll(t1, rep2)
+	log.Printf("%q\n", t2)
+	log.Printf("%s\n", t2)
+	log.Println("..................")
+	*/
+
+
+#+END_SRC

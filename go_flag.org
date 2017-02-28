@@ -1,0 +1,14 @@
+#+title: go flag使用
+
+**** 参考
+
+- [[http://blog.csdn.net/delphiwcdj/article/details/17202347][示例代码]]
+- [[http://blog.studygolang.com/2013/02/标准库-命令行参数解析flag/][命令行解析]]
+- [[http://faberliu.github.io/2014/11/12/Golang-flag包使用详解-一/][flag包详解]]
+- [[http://blog.chinaunix.net/uid-24774106-id-3993393.html][flag]]
+
+
+
+
+
+

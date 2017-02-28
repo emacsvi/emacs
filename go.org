@@ -14,5 +14,7 @@
 - [[file:go_object_instance.org][go对象初始化]]
 - [[file:go_otto.org][otto]]
 - [[file:go_mgostatement.org][mgo常用语句]]
-- [[file:go_mapmap.org][多维mapx]]
+- [[file:go_mapmap.org][多维map]]
+- [[file:go_blog.org][blog更新脚本]]
+- [[file:go_flag.org][flag使用]]
 
